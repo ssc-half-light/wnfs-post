@@ -1,10 +1,16 @@
 {
-  "name": "hermes-fission",
+  "name": "wnfs-blobs",
   "version": "0.0.0",
   "description": "Fission storage for hermes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./test/test.js | tap-arc",
+    "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
+    "build-js": "esbuild src/index.ts --bundle --format=cjs --keep-names --outfile=./dist/index.cjs",
+    "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-js && npm run build-mjs",
+    "postversion": "git push && git push --tags && npm publish",
+    "prepublishOnly": "npm run build"
+
   },
   "repository": {
     "type": "git",
@@ -15,6 +21,19 @@
   "bugs": {
     "url": "https://github.com/nichoth/hermes-fission/issues"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.11",
+    "git-hooks-plus": "^1.0.1",
+    "standardx": "^7.0.0",
+    "tap-arc": "^0.3.5",
+    "tapzero": "^0.6.1",
+    "typescript": "^4.9.5"
+  },
   "homepage": "https://github.com/nichoth/hermes-fission#readme"
 }
-
