@@ -1,6 +1,7 @@
 import * as wn from "webnative"
 import stringify from 'json-stable-stringify'
 import timestamp from 'monotonic-timestamp'
+import { sign, toString } from "./util.js"
 
 interface appInfo {
     name:string,
@@ -40,7 +41,7 @@ export class WnfsBlobs {
      * @param file the image File
      * @param newPost content for the new post
      */
-    async post (file:File, { text, alt, author }:newPost):Promise<string> {
+    async post (keystore, file:File, { text, alt, author }:newPost):Promise<object> {
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR_PATH)
@@ -62,14 +63,15 @@ export class WnfsBlobs {
         )
 
         // write the JSON
-        const newPost:string = createPostFromContent(text, {
+        const newPost:object = await createPostFromContent(keystore, {
             sequence: n,
+            text, 
             alt,
             author
         })
         await this.wnfs.write(
             newPostPath,
-            new TextEncoder().encode(newPost)
+            new TextEncoder().encode(JSON.stringify(newPost))
         )
 
         const imgFilepath = wn.path.appData(
@@ -86,6 +88,8 @@ export class WnfsBlobs {
             await this.wnfs.publish()
         }
 
+        reader.readAsArrayBuffer(file)
+
         return newPost
     }
 }
@@ -94,14 +98,16 @@ interface newPostArgs {
     sequence: number,  // post sequence number
     alt?: string,  // alt text for image
     author: string  // author DID
+    text: string  // message text
 }
 
 /**
- * @description Create a stringified post from given content.
+ * @description Create a post from given content.
  */
-function createPostFromContent (text:string,
-{ sequence, alt, author }:newPostArgs):string {
-    return stringify({
+async function createPostFromContent (keystore, args:newPostArgs):Promise<object> {
+    const { sequence, text, alt, author } = args
+
+    const msg = {
         sequence,
         timestamp: +timestamp(),
         author,
@@ -110,6 +116,11 @@ function createPostFromContent (text:string,
             text: text,
             alt: alt || '',
             mentions: [sequence + '-0.jpg']  // handle 1 image per post
-        }
-    })
+        },
+        signature: null
+    }
+
+    const sig =  await sign(keystore, stringify(msg))
+    msg.signature = toString(sig)
+    return msg
 }
