@@ -4,6 +4,7 @@ Use Fission as storage for *hermes*
 
 ## example
 
+### create an instance
 ```ts
 const APP_INFO = { name: 'test', creator: 'test' }
 
@@ -18,6 +19,9 @@ const blobs = new WnfsBlobs({
     LOG_DIR_PATH: '/log',  // optional
     BLOB_DIR_PATH: '/blobs'  // optional
 })
+```
 
+### create a post
+```ts
 const post = await blobs.post(keystore, file, { text, alt, author: authorDid })
 ```
