@@ -5,7 +5,8 @@
   "description": "Fission storage for hermes",
   "main": "index.js",
   "scripts": {
-    "test": "tsc text/index.js && node ./test/test.js | tap-arc",
+    "build-tests": "tsc --target es2020 --module es2020 --moduleResolution nodenext --skipLibCheck test/index.ts",
+    "test": "npm run build-tests && node ./test/index.js | tap-arc",
     "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
     "build-js": "esbuild src/index.ts --bundle --format=cjs --keep-names --outfile=./dist/index.cjs",
     "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-js && npm run build-mjs",
