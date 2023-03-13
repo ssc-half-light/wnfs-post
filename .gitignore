@@ -5,3 +5,4 @@ dist
 public
 package-lock.json
 src/*.js
+test/*.js

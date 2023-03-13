@@ -5,7 +5,7 @@
   "description": "Fission storage for hermes",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/test.js | tap-arc",
+    "test": "tsc text/index.js && node ./test/test.js | tap-arc",
     "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
     "build-js": "esbuild src/index.ts --bundle --format=cjs --keep-names --outfile=./dist/index.cjs",
     "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-js && npm run build-mjs",
@@ -39,6 +39,7 @@
   "homepage": "https://github.com/nichoth/hermes-fission#readme",
   "dependencies": {
     "json-stable-stringify": "^1.0.2",
+    "libp2p": "^0.42.2",
     "monotonic-timestamp": "^0.0.9"
   }
 }
