@@ -101,13 +101,21 @@ interface newPostArgs {
     text: string  // message text
 }
 
+interface Message {
+    sequence: number,
+    timestamp: number,
+    author: string,
+    content: { type:string, text:string, alt:string, mentions: string[] }
+    signature?: string
+}
+
 /**
  * @description Create a post from given content.
  */
 async function createPostFromContent (keystore, args:newPostArgs):Promise<object> {
     const { sequence, text, alt, author } = args
 
-    const msg = {
+    const msg:Message = {
         sequence,
         timestamp: +timestamp(),
         author,
@@ -116,8 +124,7 @@ async function createPostFromContent (keystore, args:newPostArgs):Promise<object
             text: text,
             alt: alt || '',
             mentions: [sequence + '-0.jpg']  // handle 1 image per post
-        },
-        signature: null
+        }
     }
 
     const sig =  await sign(keystore, stringify(msg))
