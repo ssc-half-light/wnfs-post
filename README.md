@@ -1,6 +1,6 @@
 # wnfs blobs
 
-Use Fission as storage for *hermes*
+Use Fission as storage for a merkle log with associated blobs.
 
 ## example
 
