@@ -2,6 +2,9 @@ import * as wn from 'webnative'
 import stringify from 'json-stable-stringify'
 import timestamp from 'monotonic-timestamp'
 import { sign, toString } from './util.js'
+import { Implementation } from 'webnative/components/crypto/implementation'
+// import Crypto from 'crypto'
+type KeyStore = Implementation['keystore']
 
 interface appInfo {
     name:string,
@@ -10,8 +13,16 @@ interface appInfo {
 
 interface newPost {
     text:string,
-    alt: string,
+    alt?: string,
     author: string
+}
+
+interface Message {
+    sequence: number,
+    timestamp: number,
+    author: string,
+    content: { type:string, text:string, alt:string, mentions: string[] }
+    signature?: string
 }
 
 interface wnfsBlobsArgs {
@@ -41,7 +52,8 @@ export class WnfsBlobs {
      * @param file the image File
      * @param newPost content for the new post
      */
-    async post (keystore, file:File, { text, alt, author }:newPost):Promise<object> {
+    async post (keystore:KeyStore, file:File, { text, alt, author }:newPost)
+    :Promise<Message> {
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR_PATH)
@@ -63,7 +75,7 @@ export class WnfsBlobs {
         )
 
         // write the JSON
-        const newPost:object = await createPostFromContent(keystore, {
+        const newPost:Message = await createPostFromContent(keystore, {
             sequence: n,
             text,
             alt,
@@ -101,18 +113,10 @@ interface newPostArgs {
     text: string  // message text
 }
 
-interface Message {
-    sequence: number,
-    timestamp: number,
-    author: string,
-    content: { type:string, text:string, alt:string, mentions: string[] }
-    signature?: string
-}
-
 /**
  * @description Create a post from given content.
  */
-async function createPostFromContent (keystore, args:newPostArgs):Promise<object> {
+async function createPostFromContent (keystore, args:newPostArgs):Promise<Message> {
     const { sequence, text, alt, author } = args
 
     const msg:Message = {
