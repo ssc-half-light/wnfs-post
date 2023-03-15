@@ -5,6 +5,7 @@
   "description": "Fission storage for hermes",
   "main": "index.js",
   "scripts": {
+    "lint": "standardx -v \"./**/*.ts\" ",
     "build-tests": "esbuild test/index.ts --bundle --keep-names",
     "test": "npm run build-tests --silent | tape-run | tap-arc",
     "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
