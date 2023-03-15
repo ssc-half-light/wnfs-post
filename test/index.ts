@@ -16,5 +16,4 @@ test('make a post', async t => {
         wnfs: program.session.fs,
         APP_INFO
     })
-
 })

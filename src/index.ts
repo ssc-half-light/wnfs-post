@@ -1,7 +1,7 @@
-import * as wn from "webnative"
+import * as wn from 'webnative'
 import stringify from 'json-stable-stringify'
 import timestamp from 'monotonic-timestamp'
-import { sign, toString } from "./util.js"
+import { sign, toString } from './util.js'
 
 interface appInfo {
     name:string,
@@ -36,7 +36,7 @@ export class WnfsBlobs {
 
     /**
      * @description Write a new post to the `wnfs`. This will find the latest
-     * the correct sequence number for the post, and get the signature of the 
+     * the correct sequence number for the post, and get the signature of the
      * last post
      * @param file the image File
      * @param newPost content for the new post
@@ -51,7 +51,7 @@ export class WnfsBlobs {
         const existingPosts = await this.wnfs.ls(logPath)
         const ns = (Object.keys(existingPosts) || [])
             .map(key => parseInt(key.split('.')[0]))
-            .sort((a,b) => b - a) // sort descending order
+            .sort((a, b) => b - a) // sort descending order
 
         const n = ns.length ? (ns[0] + 1) : 0
 
@@ -65,7 +65,7 @@ export class WnfsBlobs {
         // write the JSON
         const newPost:object = await createPostFromContent(keystore, {
             sequence: n,
-            text, 
+            text,
             alt,
             author
         })
@@ -127,7 +127,7 @@ async function createPostFromContent (keystore, args:newPostArgs):Promise<object
         }
     }
 
-    const sig =  await sign(keystore, stringify(msg))
+    const sig = await sign(keystore, stringify(msg))
     msg.signature = toString(sig)
     return msg
 }

@@ -13,6 +13,7 @@
     "postversion": "git push && git push --tags && npm publish",
     "prepublishOnly": "npm run build"
   },
+  "homepage": "https://github.com/nichoth/hermes-fission#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nichoth/hermes-fission.git"
@@ -28,16 +29,22 @@
       "require": "./dist/index.cjs"
     }
   },
+  "dependencies": {
+    "json-stable-stringify": "^1.0.2",
+    "monotonic-timestamp": "^0.0.9"
+  },
   "devDependencies": {
+    "@typescript-eslint/parser": "^5.55.0",
     "esbuild": "^0.15.18",
+    "standardx": "^7.0.0",
     "tap-arc": "^0.3.5",
     "tape-run": "^10.0.0",
     "tapzero": "^0.6.1",
     "webnative": "^0.36.3"
   },
-  "homepage": "https://github.com/nichoth/hermes-fission#readme",
-  "dependencies": {
-    "json-stable-stringify": "^1.0.2",
-    "monotonic-timestamp": "^0.0.9"
+  "standardx": {
+    "ignore": [
+      "dist/*"
+    ]
   }
 }
