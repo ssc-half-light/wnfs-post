@@ -1,21 +1,18 @@
 import { test } from 'tapzero'
 import { sha256 } from 'webnative/components/crypto/implementation/browser'
-import { publicKeyToDid } from 'webnative/did/transformers'
 import * as uint8arrays from 'uint8arrays'
-import type { Crypto } from 'webnative'
-
+import { createDID } from '../src/util.js'
 import { WnfsBlobs } from '../src/index.js'
 // import fs from 'fs'
 // import path from 'path'
 // import * as wn from 'webnative'
 
-// @ts-ignore
-const wn = window.webnative
-// const { crypto } = wn.components
-
 // const data = fs.readFileSync(path.join(__dirname, 'caracal.jpg'))
 // const blob = new Blob([data as BlobPart])
 // const file = new File([blob], 'caracal.jpg')
+
+// @ts-ignore
+const wn = window.webnative
 
 const blob = new Blob(['ok'], {
     type: 'image/jpeg',
@@ -49,9 +46,10 @@ test('make a post', async t => {
         author: 'abc'
     })
 
-    console.log('resssssssssssss', res)
-
+    // @TODO -- verify signature
     t.ok(res.signature)
+    t.equal(res.content.type, 'post', 'should set content.type')
+    t.equal(res.content.text, 'testing', 'should set content.text')
 })
 
 async function prepareDid (did:string): Promise<string> {
@@ -63,10 +61,10 @@ async function prepareDid (did:string): Promise<string> {
     return uint8arrays.toString(hashedUsername, 'base32').slice(0, 32)
 }
 
-const createDID = async (
-    crypto: Crypto.Implementation
-): Promise<string> => {
-    const pubKey = await crypto.keystore.publicExchangeKey()
-    const ksAlg = await crypto.keystore.getAlgorithm()
-    return publicKeyToDid(crypto, pubKey, ksAlg)
-}
+// const createDID = async function createDID (
+//     crypto: Crypto.Implementation
+// ): Promise<string> {
+//     const pubKey = await crypto.keystore.publicExchangeKey()
+//     const ksAlg = await crypto.keystore.getAlgorithm()
+//     return publicKeyToDid(crypto, pubKey, ksAlg)
+// }
