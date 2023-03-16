@@ -56,7 +56,7 @@ export class WnfsBlobs {
 
         const n = ns.length ? (ns[0] + 1) : 0
 
-        // get filepath for the post JSON
+        // get filepath for the new post JSON
         // posts are like /log-dir/1.json
         const newPostPath = wn.path.appData(
             this.APP_INFO,
@@ -70,10 +70,6 @@ export class WnfsBlobs {
             alt,
             author
         })
-        await this.wnfs.write(
-            newPostPath,
-            new TextEncoder().encode(JSON.stringify(newPost))
-        )
 
         const imgFilepath = wn.path.appData(
             this.APP_INFO,
@@ -84,8 +80,14 @@ export class WnfsBlobs {
 
         const reader = new FileReader()
         reader.onloadend = async () => {
-            await this.wnfs.write(imgFilepath, reader.result as Uint8Array)
-            console.log('img path written...', imgFilepath)
+            await Promise.all([
+                this.wnfs.write(
+                    newPostPath,
+                    new TextEncoder().encode(JSON.stringify(newPost))
+                ),
+                this.wnfs.write(imgFilepath, reader.result as Uint8Array)
+            ])
+
             await this.wnfs.publish()
         }
 
