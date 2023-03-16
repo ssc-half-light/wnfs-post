@@ -5,6 +5,9 @@ Use Fission as storage for a merkle log with associated blobs.
 ## example
 
 ### create a post
+
+`wnfsBlobs.post` will write a given post and blob to your `wnfs` filesystem, and then return the post.
+
 ```ts
 import { test } from 'tapzero'
 import { createDID, createUsername } from 'wnfs-blobs/util'
