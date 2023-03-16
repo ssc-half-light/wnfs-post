@@ -1,9 +1,6 @@
 import * as wn from 'webnative'
-import stringify from 'json-stable-stringify'
-import timestamp from 'monotonic-timestamp'
-import { sign, toString } from './util.js'
+import { Message, createPost } from './post'
 import { Implementation } from 'webnative/components/crypto/implementation'
-// import Crypto from 'crypto'
 type KeyStore = Implementation['keystore']
 
 interface appInfo {
@@ -15,14 +12,6 @@ interface newPost {
     text:string,
     alt?: string,
     author: string
-}
-
-interface Message {
-    sequence: number,
-    timestamp: number,
-    author: string,
-    content: { type:string, text:string, alt:string, mentions: string[] }
-    signature?: string
 }
 
 interface wnfsBlobsArgs {
@@ -75,7 +64,7 @@ export class WnfsBlobs {
         )
 
         // write the JSON
-        const newPost:Message = await createPostFromContent(keystore, {
+        const newPost:Message = await createPost(keystore, {
             sequence: n,
             text,
             alt,
@@ -104,34 +93,4 @@ export class WnfsBlobs {
 
         return newPost
     }
-}
-
-interface newPostArgs {
-    sequence: number,  // post sequence number
-    alt?: string,  // alt text for image
-    author: string  // author DID
-    text: string  // message text
-}
-
-/**
- * @description Create a post from given content.
- */
-async function createPostFromContent (keystore, args:newPostArgs):Promise<Message> {
-    const { sequence, text, alt, author } = args
-
-    const msg:Message = {
-        sequence,
-        timestamp: +timestamp(),
-        author,
-        content: {
-            type: 'post',
-            text: text,
-            alt: alt || '',
-            mentions: [sequence + '-0.jpg']  // handle 1 image per post
-        }
-    }
-
-    const sig = await sign(keystore, stringify(msg))
-    msg.signature = toString(sig)
-    return msg
 }

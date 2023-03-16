@@ -28,7 +28,13 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./*": [
+      "./dist/*.js",
+      "./dist/*",
+      "./dist/*/index.js",
+      "./*"
+    ]
   },
   "dependencies": {
     "json-stable-stringify": "^1.0.2",

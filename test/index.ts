@@ -25,5 +25,8 @@ test('make a post', async t => {
         APP_INFO
     })
 
-    const res = wnfsBlobs.post(keystore, file, { text: 'testing', author: '' })
+    const res = await wnfsBlobs.post(keystore, file, {
+        text: 'testing',
+        author: ''
+    })
 })
