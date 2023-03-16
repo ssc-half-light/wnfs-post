@@ -7,8 +7,8 @@ Use Fission as storage for a merkle log with associated blobs.
 ### create a post
 ```ts
 import { test } from 'tapzero'
-import { createDID, createUsername } from '../src/util.js'
-import { WnfsBlobs } from '../src/index.js'
+import { createDID, createUsername } from 'wnfs-blobs/util'
+import { WnfsBlobs } from 'wnfs-blobs/index'
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
@@ -37,8 +37,8 @@ test('make a post', async t => {
         author: 'abc'
     })
 
-    // @TODO -- verify signature
-    t.ok(res.signature)
+    
+    t.ok(res.signature)  // @TODO -- verify signature
     t.equal(res.content.type, 'post', 'should set content.type')
     t.equal(res.content.text, 'testing', 'should set content.text')
 })

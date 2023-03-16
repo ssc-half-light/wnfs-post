@@ -44,8 +44,7 @@ test('make a post', async t => {
         author: 'abc'
     })
 
-    // @TODO -- verify signature
-    t.ok(res.signature)
+    t.ok(res.signature)  // @TODO -- verify signature
     t.equal(res.content.type, 'post', 'should set content.type')
     t.equal(res.content.text, 'testing', 'should set content.text')
 })
