@@ -32,6 +32,7 @@ test('make a post', async t => {
         APP_INFO
     })
 
+    // file is an object like you would get from a form in HTML
     const res = await wnfsBlobs.post(keystore, file, {
         text: 'testing',
         author: 'abc'
