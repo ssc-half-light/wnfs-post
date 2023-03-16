@@ -2,6 +2,11 @@
 
 Use Fission as storage for a merkle log with associated blobs.
 
+## install
+```
+npm i -S @nichoth/wnfs-blobs
+```
+
 ## example
 
 ### create a post
