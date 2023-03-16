@@ -8,8 +8,8 @@
     "lint": "standardx -v \"./**/*.ts\"",
     "build-tests": "esbuild test/index.ts --bundle --format=cjs --keep-names > test/test-bundle.js",
     "test": "npm run lint && npm run build-tests && cat test/index.html | tape-run --input=html --static=test | tap-arc",
-    "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
-    "build-js": "esbuild src/index.ts --bundle --format=cjs --keep-names --outfile=./dist/index.cjs",
+    "build-mjs": "esbuild src/index.ts src/util.ts --bundle --format=esm --keep-names --outdir=./dist --out-extension:.js=.mjs",
+    "build-js": "esbuild src/index.ts src/util.ts --bundle --format=cjs --keep-names --outdir=./dist --out-extension:.js=.cjs",
     "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-js && npm run build-mjs",
     "postversion": "git push && git push --tags && npm publish",
     "prepublishOnly": "npm run build"
@@ -29,12 +29,20 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./*": [
-      "./dist/*.js",
-      "./dist/*",
-      "./dist/*/index.js",
-      "./*"
-    ]
+    "./*": {
+      "import": [
+        "./dist/*.mjs",
+        "./dist/*",
+        "./dist/*/index.mjs",
+        "./*"
+      ],
+      "require": [
+        "./dist/*.cjs",
+        "./dist/*",
+        "./dist/*/index.cjs",
+        "./*"
+      ]
+    }
   },
   "dependencies": {
     "json-stable-stringify": "^1.0.2",
