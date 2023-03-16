@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "standardx -v \"./**/*.ts\"",
-    "build-tests": "esbuild test/index.ts --bundle --keep-names",
-    "test": "npm run lint && npm run build-tests --silent | tape-run | tap-arc",
+    "build-tests": "esbuild test/index.ts --bundle --format=cjs --keep-names > test/test-bundle.js",
+    "test": "npm run lint && cat test/index.html | tape-run --input=html --static=test | tap-arc",
     "build-mjs": "esbuild src/index.ts --bundle --format=esm --keep-names --outfile=./dist/index.mjs",
     "build-js": "esbuild src/index.ts --bundle --format=cjs --keep-names --outfile=./dist/index.cjs",
     "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-js && npm run build-mjs",

@@ -1,12 +1,20 @@
 import { test } from 'tapzero'
 import { WnfsBlobs } from '../src/index.js'
-import fs from 'node:fs'
-import path from 'node:path'
-import * as wn from 'webnative'
+// import fs from 'fs'
+// import path from 'path'
+// import * as wn from 'webnative'
 
-const data = fs.readFileSync(path.join(__dirname, 'caracal.jpg'))
-const blob = new Blob([data as BlobPart])
-const file = new File([blob], 'caracal.jpg')
+// @ts-ignore
+const wn = window.webnative
+
+// const data = fs.readFileSync(path.join(__dirname, 'caracal.jpg'))
+// const blob = new Blob([data as BlobPart])
+// const file = new File([blob], 'caracal.jpg')
+
+const blob = new Blob(['ok'], {
+    type: 'image/jpeg',
+})
+const file = new File([blob], 'ok.jpg', { type: 'image/jpeg' })
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
@@ -29,4 +37,7 @@ test('make a post', async t => {
         text: 'testing',
         author: ''
     })
+
+    t.ok(res.signature)
+    console.log('res', res)
 })
