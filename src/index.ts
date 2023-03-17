@@ -35,9 +35,8 @@ export class WnfsBlobs {
     }
 
     /**
-     * @description Write a new post to the `wnfs`. This will find the latest
-     * the correct sequence number for the post, and get the signature of the
-     * last post
+     * @description Write a new post to the `wnfs`. This will find the correct
+     * sequence number for the post
      * @param file the image File
      * @param newPost content for the new post
      */
