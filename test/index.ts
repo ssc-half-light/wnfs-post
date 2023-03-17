@@ -36,12 +36,12 @@ test('make a post', async t => {
     // constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs }:wnfsBlobsArgs) {
     const wnfsBlobs = new WnfsBlobs({
         wnfs: session.fs,
-        APP_INFO
+        APP_INFO,
+        program
     })
 
     const res = await wnfsBlobs.post(keystore, file, {
-        text: 'testing',
-        author: 'abc'
+        text: 'testing'
     })
 
     t.ok(res.signature)  // @TODO -- verify signature

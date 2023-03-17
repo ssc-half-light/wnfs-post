@@ -1,5 +1,6 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
+import { publicWriteKeyToDid } from './util'
 import { Implementation } from 'webnative/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
@@ -10,8 +11,7 @@ interface appInfo {
 
 interface newPost {
     text:string,
-    alt?: string,
-    author: string
+    alt?: string
 }
 
 interface wnfsBlobsArgs {
@@ -19,6 +19,7 @@ interface wnfsBlobsArgs {
     LOG_DIR_PATH?: string,
     wnfs: wn.FileSystem
     BLOB_DIR_PATH?: string
+    program: wn.Program
 }
 
 export class WnfsBlobs {
@@ -26,8 +27,10 @@ export class WnfsBlobs {
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
     wnfs:wn.FileSystem
+    program: wn.Program
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs }:wnfsBlobsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program }:wnfsBlobsArgs) {
+        this.program = program
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
@@ -40,7 +43,7 @@ export class WnfsBlobs {
      * @param file the image File
      * @param newPost content for the new post
      */
-    async post (keystore:KeyStore, file:File, { text, alt, author }:newPost)
+    async post (keystore:KeyStore, file:File, { text, alt }:newPost)
     :Promise<Message> {
         const logPath = wn.path.appData(
             this.APP_INFO,
@@ -61,6 +64,8 @@ export class WnfsBlobs {
             this.APP_INFO,
             wn.path.file(this.LOG_DIR_PATH, n + '.json')
         )
+
+        const author = await publicWriteKeyToDid(this.program.components.crypto)
 
         // write the JSON
         const newPost:Message = await createPost(keystore, {

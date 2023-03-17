@@ -1,7 +1,7 @@
 import * as uint8arrays from 'uint8arrays'
 import { sha256 } from 'webnative/components/crypto/implementation/browser'
-import { publicKeyToDid } from 'webnative/did/transformers'
 import type { Crypto } from 'webnative'
+import { publicKeyToDid } from 'webnative/did/transformers'
 import { Implementation } from 'webnative/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
@@ -26,6 +26,13 @@ export async function createDID (
     crypto: Crypto.Implementation
 ): Promise<string> {
     const pubKey = await crypto.keystore.publicExchangeKey()
+    const ksAlg = await crypto.keystore.getAlgorithm()
+    return publicKeyToDid(crypto, pubKey, ksAlg)
+}
+
+export async function publicWriteKeyToDid (crypto: Crypto.Implementation)
+:Promise<string> {
+    const pubKey = await crypto.keystore.publicWriteKey()
     const ksAlg = await crypto.keystore.getAlgorithm()
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }
