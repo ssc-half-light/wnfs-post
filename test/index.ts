@@ -1,5 +1,5 @@
 import { test } from 'tapzero'
-import { createDID, createUsername } from '../src/util.js'
+import { createDID, createUsername, verify } from '../src/util.js'
 import { WnfsPosts } from '../src/index.js'
 import { writeKeyToDid } from '../src/util'
 
@@ -39,4 +39,5 @@ test('make a post', async t => {
     t.ok(post.signature, 'should have a signature')  // @TODO -- verify signature
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
+    t.equal(await verify(post.author, post), true, 'should verify the post')
 })

@@ -3,6 +3,8 @@ import type { Crypto } from 'webnative'
 import { publicKeyToDid } from 'webnative/did/transformers'
 import * as BrowserCrypto from 'webnative/components/crypto/implementation/browser'
 import { Implementation } from 'webnative/components/crypto/implementation'
+import stringify from 'json-stable-stringify'
+import { Message } from './post'
 type KeyStore = Implementation['keystore']
 
 const KEY_TYPE = {
@@ -49,12 +51,16 @@ export async function writeKeyToDid (crypto: Crypto.Implementation)
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }
 
-export const verify = async (did:string, sig:string, msg:string) => {
+export const verify = async (did:string, msg:Message) => {
     const { publicKey, type } = didToPublicKey(did)
     const keyType = BrowserCrypto.did.keyTypes[type]
+    const sig = msg.signature as string
+    const msgValue:Partial<Message> = Object.assign({}, msg)
+    delete msgValue.signature
+    const msgString = stringify(msgValue)
 
     const res = await keyType.verify({
-        message: uint8arrays.fromString(msg),
+        message: uint8arrays.fromString(msgString),
         publicKey,
         signature: uint8arrays.fromString(sig, 'base64url')
     })

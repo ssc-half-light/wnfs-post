@@ -16,7 +16,7 @@ export interface Message {
     timestamp: number,
     author: string,
     content: { type:string, text:string, alt:string, mentions: string[] }
-    signature?: string
+    signature: string
 }
 
 /**
@@ -25,7 +25,7 @@ export interface Message {
 export async function createPost (keystore:KeyStore, args:newPostArgs):Promise<Message> {
     const { sequence, text, alt, author } = args
 
-    const msg:Message = {
+    const unsignedMsg = {
         sequence,
         timestamp: +timestamp(),
         author,
@@ -37,7 +37,23 @@ export async function createPost (keystore:KeyStore, args:newPostArgs):Promise<M
         }
     }
 
-    const sig = await sign(keystore, stringify(msg))
-    msg.signature = toString(sig)
+    const msg:Message = Object.assign(unsignedMsg, {
+        signature: toString(await sign(keystore, stringify(unsignedMsg)))
+    })
+
+    // const msg:Message = {
+    //     sequence,
+    //     timestamp: +timestamp(),
+    //     author,
+    //     content: {
+    //         type: 'post',
+    //         text: text,
+    //         alt: alt || '',
+    //         mentions: [sequence + '-0.jpg']  // handle 1 image per post
+    //     }
+    // }
+
+    // const sig = await sign(keystore, stringify(msg))
+    // msg.signature = toString(sig)
     return msg
 }
