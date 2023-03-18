@@ -2,18 +2,13 @@ import * as wn from 'webnative'
 import { Message, createPost } from './post'
 import { writeKeyToDid } from './util'
 
-interface appInfo {
-    name:string,
-    creator:string
-}
-
-interface newPost {
+interface newPostArgs {
     text:string,
     alt?: string
 }
 
 interface wnfsBlobsArgs {
-    APP_INFO: appInfo,
+    APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH?: string,
     wnfs: wn.FileSystem
     BLOB_DIR_PATH?: string
@@ -21,7 +16,7 @@ interface wnfsBlobsArgs {
 }
 
 export class WnfsPosts {
-    APP_INFO:appInfo
+    APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
     wnfs:wn.FileSystem
@@ -38,10 +33,13 @@ export class WnfsPosts {
     /**
      * @description Write a new post to the `wnfs`. This will find the correct
      * sequence number and author DID for the post, and sign the post
-     * @param file the image File, like from an HTML form
-     * @param newPost content for the new post
+     * @param file - the image File, like from an HTML form
+     * @param {object} newPostArgs content for the new post
+     * @param {string} newPostArgs.text newPostArgs.text - text content for the post
+     * @param {string} newPostArgs.alt newPostArgs.alt -
+     * `alt` text attribute for the image
      */
-    async post (file:File, { text, alt }:newPost):Promise<Message> {
+    async post (file:File, { text, alt }:newPostArgs):Promise<Message> {
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR_PATH)
