@@ -29,18 +29,15 @@ test('make a post', async t => {
 
     // *must* call `register` before we use the `session`
     await program.auth.register({ username })
-
-    const { keystore } = program.components.crypto
     const session = program.session ?? await program.auth.session()
 
-    // constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs }:wnfsBlobsArgs) {
     const wnfsBlobs = new WnfsBlobs({
         wnfs: session.fs,
         APP_INFO,
         program
     })
 
-    const res = await wnfsBlobs.post(keystore, file, {
+    const res = await wnfsBlobs.post(file, {
         text: 'testing'
     })
 

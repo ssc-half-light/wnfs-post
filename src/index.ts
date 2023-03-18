@@ -1,8 +1,6 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
 import { publicWriteKeyToDid } from './util'
-import { Implementation } from 'webnative/components/crypto/implementation'
-type KeyStore = Implementation['keystore']
 
 interface appInfo {
     name:string,
@@ -43,8 +41,7 @@ export class WnfsBlobs {
      * @param file the image File
      * @param newPost content for the new post
      */
-    async post (keystore:KeyStore, file:File, { text, alt }:newPost)
-    :Promise<Message> {
+    async post (file:File, { text, alt }:newPost):Promise<Message> {
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR_PATH)
@@ -65,6 +62,7 @@ export class WnfsBlobs {
             wn.path.file(this.LOG_DIR_PATH, n + '.json')
         )
 
+        const { keystore } = this.program.components.crypto
         const author = await publicWriteKeyToDid(this.program.components.crypto)
 
         // write the JSON
