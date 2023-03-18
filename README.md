@@ -49,3 +49,10 @@ test('make a post', async t => {
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })
 ```
+
+### verify a post
+```ts
+import { verify } from 'wnfs-post/util'
+// const post = { author: '', signature: '', ... }
+const isValid = await verify(post.author, post)
+```

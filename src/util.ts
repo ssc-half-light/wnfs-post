@@ -2,9 +2,9 @@ import * as uint8arrays from 'uint8arrays'
 import type { Crypto } from 'webnative'
 import { publicKeyToDid } from 'webnative/did/transformers'
 import * as BrowserCrypto from 'webnative/components/crypto/implementation/browser'
-import { Implementation } from 'webnative/components/crypto/implementation'
 import stringify from 'json-stable-stringify'
 import { Message } from './post'
+import { Implementation } from 'webnative/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
 const KEY_TYPE = {
