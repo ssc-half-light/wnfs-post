@@ -68,7 +68,8 @@ export class WnfsPosts {
             sequence: n,
             text,
             alt,
-            author
+            author,
+            username: (this.program.session as wn.Session).username
         })
 
         const imgFilepath = wn.path.appData(
