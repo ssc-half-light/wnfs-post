@@ -1,5 +1,5 @@
 {
-  "name": "@nichoth/wnfs-blobs",
+  "name": "@nichoth/wnfs-post",
   "type": "module",
   "version": "0.1.0",
   "description": "Fission storage for hermes",

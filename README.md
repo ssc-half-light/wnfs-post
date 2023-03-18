@@ -4,19 +4,19 @@ Use Fission as storage for post objects with associated blobs.
 
 ## install
 ```
-npm i -S @nichoth/wnfs-blobs
+npm i -S @nichoth/wnfs-post
 ```
 
 ## example
 
 ### create a post
 
-`wnfsBlobs.post` will write a given post and blob to your `wnfs` filesystem, and then return the post.
+`wnfsPost.post` will write a given post and blob to your `wnfs` filesystem, and then return the post.
 
 ```ts
 import { test } from 'tapzero'
-import { createDID, createUsername } from 'wnfs-blobs/util'
-import { WnfsBlobs } from 'wnfs-blobs/index'
+import { createDID, createUsername, verify } from 'wnfs-post/util'
+import { WnfsBlobs } from 'wnfs-post/index'
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
@@ -31,20 +31,21 @@ test('make a post', async t => {
     await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
 
-    const wnfsBlobs = new WnfsBlobs({
+    const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
         program
     })
 
-    const post = await wnfsBlobs.post(file, {
+    const post = await wnfsPosts.post(file, {
         text: 'testing'
     })
 
     t.equal(post.author, await writeKeyToDid(program.components.crypto),
         'should have the right author in the post')
-    t.ok(post.signature, 'should have a signature')
+    t.ok(post.signature, 'should have a signature')  // @TODO -- verify signature
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
+    t.equal(await verify(post.author, post), true, 'should verify the post')
 })
 ```
