@@ -1,5 +1,5 @@
 import { test } from 'tapzero'
-import { createDID, createUsername, verify } from '../src/util.js'
+import { createUsername, verify } from '../src/util.js'
 import { WnfsPosts } from '../src/index.js'
 import { writeKeyToDid } from '../src/util'
 
@@ -17,12 +17,12 @@ test('make a post', async t => {
     const program = await wn.program({
         namespace: APP_INFO
     })
-    const { crypto } = program.components
-    const username = await createUsername(await createDID(crypto))
 
     // *must* call `register` before we use the `session`
-    await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
+    const username = await createUsername(program)
+    console.log('user name', username)
+    await program.auth.register({ username })
 
     const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,

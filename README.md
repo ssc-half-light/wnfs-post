@@ -56,3 +56,16 @@ import { verify } from 'wnfs-post/util'
 // const post = { author: '', signature: '', ... }
 const isValid = await verify(post.author, post)
 ```
+
+### create a username
+This will create a unique 32 character string that will be used for DNS, and is unique per account (not per machine).
+
+```ts
+import * as wn from 'webnative'
+import { createUsername } from 'wnfs-post/util'
+
+const program = await wn.program({
+    namespace: APP_INFO
+})
+const username = await createUsername(program)
+```
