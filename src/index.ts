@@ -1,6 +1,6 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
-import { publicWriteKeyToDid } from './util'
+import { writeKeyToDid } from './util'
 
 interface appInfo {
     name:string,
@@ -37,8 +37,8 @@ export class WnfsBlobs {
 
     /**
      * @description Write a new post to the `wnfs`. This will find the correct
-     * sequence number for the post
-     * @param file the image File
+     * sequence number and author DID for the post, and sign the post
+     * @param file the image File, like from an HTML form
      * @param newPost content for the new post
      */
     async post (file:File, { text, alt }:newPost):Promise<Message> {
@@ -63,7 +63,7 @@ export class WnfsBlobs {
         )
 
         const { keystore } = this.program.components.crypto
-        const author = await publicWriteKeyToDid(this.program.components.crypto)
+        const author = await writeKeyToDid(this.program.components.crypto)
 
         // write the JSON
         const newPost:Message = await createPost(keystore, {

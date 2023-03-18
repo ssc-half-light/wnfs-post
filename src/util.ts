@@ -30,7 +30,7 @@ export async function createDID (
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }
 
-export async function publicWriteKeyToDid (crypto: Crypto.Implementation)
+export async function writeKeyToDid (crypto: Crypto.Implementation)
 :Promise<string> {
     const [pubKey, ksAlg] = await Promise.all([
         await crypto.keystore.publicWriteKey(),
