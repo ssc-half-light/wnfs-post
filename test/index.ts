@@ -1,6 +1,7 @@
 import { test } from 'tapzero'
 import { createDID, createUsername } from '../src/util.js'
 import { WnfsBlobs } from '../src/index.js'
+import { publicWriteKeyToDid } from '../src/util'
 // import fs from 'fs'
 // import path from 'path'
 // import * as wn from 'webnative'
@@ -43,6 +44,8 @@ test('make a post', async t => {
         text: 'testing'
     })
 
+    t.equal(res.author, await publicWriteKeyToDid(program.components.crypto),
+        'should have the right author in the post')
     // @TODO -- verify signature
     t.ok(res.signature, 'post should have a signature')
     t.equal(res.content.type, 'post', 'should set content.type')
