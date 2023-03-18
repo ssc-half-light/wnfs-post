@@ -24,10 +24,9 @@ test('make a post', async t => {
     const program = await wn.program({
         namespace: APP_INFO
     })
-    const { crypto } = program.components
-    const username = await createUsername(await createDID(crypto))
 
     // *must* call `register` before we use the `session`
+    const username = await createUsername(program)
     await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
 
@@ -43,7 +42,7 @@ test('make a post', async t => {
 
     t.equal(post.author, await writeKeyToDid(program.components.crypto),
         'should have the right author in the post')
-    t.ok(post.signature, 'should have a signature')  // @TODO -- verify signature
+    t.ok(post.signature, 'should have a signature')
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
     t.equal(await verify(post.author, post), true, 'should verify the post')

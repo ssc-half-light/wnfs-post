@@ -19,14 +19,9 @@ test('make a post', async t => {
     })
 
     // *must* call `register` before we use the `session`
-    const session = program.session ?? await program.auth.session()
     const username = await createUsername(program)
-    console.log('user name', username)
     await program.auth.register({ username })
-
-    console.log('2222', username)
-
-    console.log('session', !!session)
+    const session = program.session ?? await program.auth.session()
 
     const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
@@ -34,15 +29,12 @@ test('make a post', async t => {
         program
     })
 
-    console.log('333', !!wnfsPosts)
-
     const post = await wnfsPosts.post(file, {
         text: 'testing'
     })
 
     t.equal(post.author, await writeKeyToDid(program.components.crypto),
         'should have the right author in the post')
-    t.ok(post.signature, 'should have a signature')  // @TODO -- verify signature
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
     t.equal(await verify(post.author, post), true, 'should verify the post')

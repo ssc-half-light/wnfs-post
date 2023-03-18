@@ -37,9 +37,7 @@ export async function createUsername (program:wn.Program):Promise<string> {
     return uint8arrays.toString(hashedUsername, 'base32').slice(0, 32)
 }
 
-async function createDID (
-    crypto: Crypto.Implementation
-): Promise<string> {
+async function createDID (crypto: Crypto.Implementation): Promise<string> {
     const pubKey = await crypto.keystore.publicExchangeKey()
     const ksAlg = await crypto.keystore.getAlgorithm()
     return publicKeyToDid(crypto, pubKey, ksAlg)
