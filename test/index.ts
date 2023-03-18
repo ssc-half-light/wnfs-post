@@ -15,7 +15,8 @@ test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
 
     const program = await wn.program({
-        namespace: APP_INFO
+        namespace: APP_INFO,
+        debug: true
     })
 
     // *must* call `register` before we use the `session`
