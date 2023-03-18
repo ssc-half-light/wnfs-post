@@ -29,9 +29,6 @@ test('make a post', async t => {
 
     // *must* call `register` before we use the `session`
     await program.auth.register({ username })
-
-    const { keystore } = program.components.crypto
-
     const session = program.session ?? await program.auth.session()
 
     const wnfsBlobs = new WnfsBlobs({
@@ -40,15 +37,14 @@ test('make a post', async t => {
         program
     })
 
-    // file is an object like you would get from a form in HTML
-    const res = await wnfsBlobs.post(keystore, file, {
-        text: 'testing',
-        author: 'abc'
+    const post = await wnfsBlobs.post(file, {
+        text: 'testing'
     })
 
-    
-    t.ok(res.signature)  // @TODO -- verify signature
-    t.equal(res.content.type, 'post', 'should set content.type')
-    t.equal(res.content.text, 'testing', 'should set content.text')
+    t.equal(post.author, await writeKeyToDid(program.components.crypto),
+        'should have the right author in the post')
+    t.ok(post.signature, 'should have a signature')
+    t.equal(post.content.type, 'post', 'should set content.type')
+    t.equal(post.content.text, 'testing', 'should set content.text')
 })
 ```

@@ -37,13 +37,13 @@ test('make a post', async t => {
         program
     })
 
-    const res = await wnfsBlobs.post(file, {
+    const post = await wnfsBlobs.post(file, {
         text: 'testing'
     })
 
-    t.equal(res.author, await writeKeyToDid(program.components.crypto),
+    t.equal(post.author, await writeKeyToDid(program.components.crypto),
         'should have the right author in the post')
-    t.ok(res.signature, 'should have a signature')  // @TODO -- verify signature
-    t.equal(res.content.type, 'post', 'should set content.type')
-    t.equal(res.content.text, 'testing', 'should set content.text')
+    t.ok(post.signature, 'should have a signature')  // @TODO -- verify signature
+    t.equal(post.content.type, 'post', 'should set content.type')
+    t.equal(post.content.text, 'testing', 'should set content.text')
 })
