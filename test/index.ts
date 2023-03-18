@@ -1,14 +1,7 @@
 import { test } from 'tapzero'
 import { createDID, createUsername } from '../src/util.js'
-import { WnfsBlobs } from '../src/index.js'
+import { WnfsPosts } from '../src/index.js'
 import { writeKeyToDid } from '../src/util'
-// import fs from 'fs'
-// import path from 'path'
-// import * as wn from 'webnative'
-
-// const data = fs.readFileSync(path.join(__dirname, 'caracal.jpg'))
-// const blob = new Blob([data as BlobPart])
-// const file = new File([blob], 'caracal.jpg')
 
 // @ts-ignore
 const wn = window.webnative
@@ -31,13 +24,13 @@ test('make a post', async t => {
     await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
 
-    const wnfsBlobs = new WnfsBlobs({
+    const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
         program
     })
 
-    const post = await wnfsBlobs.post(file, {
+    const post = await wnfsPosts.post(file, {
         text: 'testing'
     })
 

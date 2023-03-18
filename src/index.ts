@@ -20,7 +20,7 @@ interface wnfsBlobsArgs {
     program: wn.Program
 }
 
-export class WnfsBlobs {
+export class WnfsPosts {
     APP_INFO:appInfo
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
