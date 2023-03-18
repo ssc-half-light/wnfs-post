@@ -36,7 +36,8 @@ test('make a post', async t => {
 
     const wnfsBlobs = new WnfsBlobs({
         wnfs: session.fs,
-        APP_INFO
+        APP_INFO,
+        program
     })
 
     // file is an object like you would get from a form in HTML

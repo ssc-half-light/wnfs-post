@@ -32,7 +32,9 @@ export async function createDID (
 
 export async function publicWriteKeyToDid (crypto: Crypto.Implementation)
 :Promise<string> {
-    const pubKey = await crypto.keystore.publicWriteKey()
-    const ksAlg = await crypto.keystore.getAlgorithm()
+    const [pubKey, ksAlg] = await Promise.all([
+        await crypto.keystore.publicWriteKey(),
+        await crypto.keystore.getAlgorithm()
+    ])
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }

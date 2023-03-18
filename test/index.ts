@@ -30,7 +30,6 @@ test('make a post', async t => {
     await program.auth.register({ username })
 
     const { keystore } = program.components.crypto
-
     const session = program.session ?? await program.auth.session()
 
     // constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs }:wnfsBlobsArgs) {
@@ -44,7 +43,8 @@ test('make a post', async t => {
         text: 'testing'
     })
 
-    t.ok(res.signature)  // @TODO -- verify signature
+    // @TODO -- verify signature
+    t.ok(res.signature, 'post should have a signature')
     t.equal(res.content.type, 'post', 'should set content.type')
     t.equal(res.content.text, 'testing', 'should set content.text')
 })
