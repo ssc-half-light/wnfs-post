@@ -16,6 +16,7 @@
     "no-undef": "off",
     "indent": [ "error", 4 ],
     "comma-dangle": "off",
+    "array-bracket-spacing": "off",
     "no-multi-spaces": ["error", { "ignoreEOLComments": true }]
   }
 }

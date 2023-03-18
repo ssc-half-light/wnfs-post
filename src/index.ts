@@ -33,8 +33,8 @@ export class WnfsPosts {
     /**
      * @description Write a new post to the `wnfs`. This will find the correct
      * sequence number and author DID for the post, and sign the post
-     * @param file - the image File, like from an HTML form
-     * @param {object} newPostArgs content for the new post
+     * @param {File} file - the image File, like from an HTML form
+     * @param {Object} newPostArgs content for the new post
      * @param {string} newPostArgs.text newPostArgs.text - text content for the post
      * @param {string} newPostArgs.alt newPostArgs.alt -
      * `alt` text attribute for the image
