@@ -52,6 +52,7 @@ test('make a post', async t => {
 ### verify a post
 ```ts
 import { verify } from 'wnfs-post/util'
+
 // const post = { author: '', signature: '', ... }
 const isValid = await verify(post.author, post)
 ```
@@ -64,7 +65,7 @@ import * as wn from 'webnative'
 import { createUsername } from 'wnfs-post/util'
 
 const program = await wn.program({
-    namespace: APP_INFO
+    namespace: { name: 'test', creator: 'test' }
 })
 const username = await createUsername(program)
 ```

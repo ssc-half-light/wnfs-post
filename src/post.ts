@@ -41,19 +41,5 @@ export async function createPost (keystore:KeyStore, args:newPostArgs):Promise<M
         signature: toString(await sign(keystore, stringify(unsignedMsg)))
     })
 
-    // const msg:Message = {
-    //     sequence,
-    //     timestamp: +timestamp(),
-    //     author,
-    //     content: {
-    //         type: 'post',
-    //         text: text,
-    //         alt: alt || '',
-    //         mentions: [sequence + '-0.jpg']  // handle 1 image per post
-    //     }
-    // }
-
-    // const sig = await sign(keystore, stringify(msg))
-    // msg.signature = toString(sig)
     return msg
 }
