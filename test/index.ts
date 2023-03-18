@@ -24,11 +24,17 @@ test('make a post', async t => {
     console.log('user name', username)
     await program.auth.register({ username })
 
+    console.log('2222', username)
+
+    console.log('session', !!session)
+
     const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
         program
     })
+
+    console.log('333', !!wnfsPosts)
 
     const post = await wnfsPosts.post(file, {
         text: 'testing'
