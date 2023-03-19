@@ -27,7 +27,8 @@ test('make a post', async t => {
     const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
-        program
+        program,
+        session
     })
 
     const post = await wnfsPosts.post(file, {
