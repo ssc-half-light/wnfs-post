@@ -15,7 +15,8 @@ test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
 
     const program = await wn.program({
-        namespace: APP_INFO
+        namespace: APP_INFO,
+        debug: true
     })
 
     // *must* call `register` before we use the `session`
@@ -26,7 +27,8 @@ test('make a post', async t => {
     const wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
-        program
+        program,
+        session
     })
 
     const post = await wnfsPosts.post(file, {
@@ -37,5 +39,6 @@ test('make a post', async t => {
         'should have the right author in the post')
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
+    t.equal(post.username, username, 'should have the username in the post')
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })

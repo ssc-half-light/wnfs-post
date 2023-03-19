@@ -13,6 +13,7 @@ interface wnfsBlobsArgs {
     wnfs: wn.FileSystem
     BLOB_DIR_PATH?: string
     program: wn.Program
+    session: wn.Session
 }
 
 export class WnfsPosts {
@@ -21,9 +22,11 @@ export class WnfsPosts {
     BLOB_DIR_PATH:string
     wnfs:wn.FileSystem
     program: wn.Program
+    session: wn.Session
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program }:wnfsBlobsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsBlobsArgs) {
         this.program = program
+        this.session = session
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
@@ -68,7 +71,8 @@ export class WnfsPosts {
             sequence: n,
             text,
             alt,
-            author
+            author,
+            username: (this.session).username
         })
 
         const imgFilepath = wn.path.appData(
