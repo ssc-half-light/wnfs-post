@@ -22,7 +22,7 @@ export interface Message {
 }
 
 /**
- * @description Create a post from given content.
+ * @description Create a signed post from given content.
  */
 export async function createPost (keystore:KeyStore, args:newPostArgs):Promise<Message> {
     const { sequence, text, alt, author, username } = args

@@ -1,13 +1,19 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
+import { createProfile, Profile } from './profile'
 import { writeKeyToDid } from './util'
+
+interface newProfile {
+    description?: string,
+    humanName: string
+}
 
 interface newPostArgs {
     text:string,
     alt?: string
 }
 
-interface wnfsBlobsArgs {
+interface wnfsPostsArgs {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH?: string,
     wnfs: wn.FileSystem
@@ -24,7 +30,7 @@ export class WnfsPosts {
     program: wn.Program
     session: wn.Session
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsBlobsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsPostsArgs) {
         this.program = program
         this.session = session
         this.APP_INFO = APP_INFO
@@ -72,7 +78,7 @@ export class WnfsPosts {
             text,
             alt,
             author,
-            username: (this.session).username
+            username: this.session.username
         })
 
         const imgFilepath = wn.path.appData(
@@ -98,5 +104,20 @@ export class WnfsPosts {
         reader.readAsArrayBuffer(file)
 
         return newPost
+    }
+
+    /**
+     * @description Create a signed profile and write it to your `wnfs`,
+     * at the right path.
+     */
+    async profile (args:newProfile):Promise<Profile> {
+        const profileArgs = Object.assign({}, args, {
+            author: await writeKeyToDid(this.program.components.crypto),
+            username: this.session.username,
+            rootDID: await this.program.accountDID(this.session.username)
+        })
+        const { keystore } = this.program.components.crypto
+
+        return createProfile(keystore, profileArgs)
     }
 }
