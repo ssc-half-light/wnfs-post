@@ -141,10 +141,12 @@ export class WnfsPosts {
             wn.path.file(this.PROFILE_PATH)
         )
 
-        this.wnfs.write(
+        await this.wnfs.write(
             profilePath,
             new TextEncoder().encode(JSON.stringify(updatedProfile))
         )
+
+        await this.wnfs.publish()
 
         return updatedProfile
     }
