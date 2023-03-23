@@ -50,11 +50,11 @@ test('make a profile', async t => {
         description: 'look at my description'
     })
 
-    t.equal(typeof profile.username, 'string', 'should have username')
-    t.equal(typeof profile.humanName, 'aaa', 'should have username')
+    t.equal(typeof profile.username, 'string', 'should have a username')
+    t.equal(profile.humanName, 'aaa', 'should have a human name')
     t.equal(profile.description, 'look at my description',
         'should have description')
-    t.equal(typeof profile.signature, 'string', 'should have signature')
+    t.equal(typeof profile.signature, 'string', 'should have a signature')
 })
 
 // test('read your own profile', async t => {
