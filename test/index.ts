@@ -10,6 +10,7 @@ const blob = new Blob(['ok'], {
     type: 'image/jpeg',
 })
 const file = new File([blob], 'ok.jpg', { type: 'image/jpeg' })
+let wnfsPosts:WnfsPosts
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
@@ -24,7 +25,7 @@ test('make a post', async t => {
     await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
 
-    const wnfsPosts = new WnfsPosts({
+    wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
         program,
@@ -42,3 +43,20 @@ test('make a post', async t => {
     t.equal(post.username, username, 'should have the username in the post')
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })
+
+test('make a profile', async t => {
+    const profile = await wnfsPosts.profile({
+        humanName: 'aaa',
+        description: 'look at my description'
+    })
+
+    t.equal(typeof profile.username, 'string', 'should have username')
+    t.equal(typeof profile.humanName, 'aaa', 'should have username')
+    t.equal(profile.description, 'look at my description',
+        'should have description')
+    t.equal(typeof profile.signature, 'string', 'should have signature')
+})
+
+// test('read your own profile', async t => {
+
+// })

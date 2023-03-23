@@ -84,7 +84,7 @@ export function didToPublicKey (did:string): ({ publicKey:Uint8Array, type:strin
     }
 }
 
-export function rootDIDforUsername (program, username):Promise<string> {
+export function rootDIDForUsername (program, username):Promise<string> {
     return program.accountDID(username)
 }
 

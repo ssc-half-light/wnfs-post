@@ -1,7 +1,7 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
-import { writeKeyToDid, rootDIDforUsername } from './util'
+import { writeKeyToDid, rootDIDForUsername } from './util'
 
 interface newProfile {
     description?: string,
@@ -26,6 +26,7 @@ export class WnfsPosts {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
+    PROFILE_PATH:string
     wnfs:wn.FileSystem
     program: wn.Program
     session: wn.Session
@@ -37,6 +38,7 @@ export class WnfsPosts {
         this.wnfs = wnfs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
+        this.PROFILE_PATH = 'profile.json'
     }
 
     /**
@@ -95,6 +97,7 @@ export class WnfsPosts {
                     newPostPath,
                     new TextEncoder().encode(JSON.stringify(newPost))
                 ),
+
                 this.wnfs.write(imgFilepath, reader.result as Uint8Array)
             ])
 
@@ -111,13 +114,27 @@ export class WnfsPosts {
      * at the right path.
      */
     async profile (args:newProfile):Promise<Profile> {
-        const profileArgs = Object.assign({}, args, {
+        const profileArgs = {
+            humanName: args.humanName,
+            description: args.description,
             author: await writeKeyToDid(this.program.components.crypto),
             username: this.session.username,
-            rootDID: await rootDIDforUsername(this.program, this.session.username)
-        })
+            rootDID: await rootDIDForUsername(this.program, this.session.username)
+        }
         const { keystore } = this.program.components.crypto
 
-        return createProfile(keystore, profileArgs)
+        const updatedProfile = createProfile(keystore, profileArgs)
+
+        const profilePath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.file(this.PROFILE_PATH)
+        )
+
+        this.wnfs.write(
+            profilePath,
+            new TextEncoder().encode(JSON.stringify(updatedProfile))
+        )
+
+        return updatedProfile
     }
 }

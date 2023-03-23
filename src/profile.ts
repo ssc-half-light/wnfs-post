@@ -5,6 +5,7 @@ type KeyStore = Implementation['keystore']
 
 export interface Profile {
     type: string,
+    humanName: string,
     username: string,
     rootDID: string,
     description?: string,
