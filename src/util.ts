@@ -84,6 +84,10 @@ export function didToPublicKey (did:string): ({ publicKey:Uint8Array, type:strin
     }
 }
 
+export function rootDIDforUsername (program, username):Promise<string> {
+    return program.accountDID(username)
+}
+
 /**
  * Parse magic bytes on prefixed key-buffer
  * to determine cryptosystem & the unprefixed key-buffer.

@@ -1,7 +1,7 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
-import { writeKeyToDid } from './util'
+import { writeKeyToDid, rootDIDforUsername } from './util'
 
 interface newProfile {
     description?: string,
@@ -114,7 +114,7 @@ export class WnfsPosts {
         const profileArgs = Object.assign({}, args, {
             author: await writeKeyToDid(this.program.components.crypto),
             username: this.session.username,
-            rootDID: await this.program.accountDID(this.session.username)
+            rootDID: await rootDIDforUsername(this.program, this.session.username)
         })
         const { keystore } = this.program.components.crypto
 
