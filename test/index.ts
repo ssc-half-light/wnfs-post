@@ -60,5 +60,7 @@ test('make a profile', async t => {
 test('read your own profile', async t => {
     const profile = await wnfsPosts.profile()
     t.ok(profile, 'should get profile')
-    t.equal(profile.type, 'about', 'should have "about" property')
+    t.equal(profile.type, 'about', 'should have "type: about" property')
+    t.equal(profile.description, 'look at my description',
+        'should have the right description')
 })
