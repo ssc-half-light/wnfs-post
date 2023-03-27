@@ -1,13 +1,19 @@
 import * as wn from 'webnative'
 import { Message, createPost } from './post'
-import { writeKeyToDid } from './util'
+import { createProfile, Profile } from './profile'
+import { writeKeyToDid, rootDIDForUsername } from './util'
+
+interface newProfile {
+    description?: string,
+    humanName: string,
+}
 
 interface newPostArgs {
     text:string,
     alt?: string
 }
 
-interface wnfsBlobsArgs {
+interface wnfsPostsArgs {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH?: string,
     wnfs: wn.FileSystem
@@ -20,17 +26,19 @@ export class WnfsPosts {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
+    PROFILE_PATH:string
     wnfs:wn.FileSystem
     program: wn.Program
     session: wn.Session
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsBlobsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsPostsArgs) {
         this.program = program
         this.session = session
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
+        this.PROFILE_PATH = 'profile.json'
     }
 
     /**
@@ -72,7 +80,7 @@ export class WnfsPosts {
             text,
             alt,
             author,
-            username: (this.session).username
+            username: this.session.username
         })
 
         const imgFilepath = wn.path.appData(
@@ -89,6 +97,7 @@ export class WnfsPosts {
                     newPostPath,
                     new TextEncoder().encode(JSON.stringify(newPost))
                 ),
+
                 this.wnfs.write(imgFilepath, reader.result as Uint8Array)
             ])
 
@@ -98,5 +107,45 @@ export class WnfsPosts {
         reader.readAsArrayBuffer(file)
 
         return newPost
+    }
+
+    /**
+     * @description Create a signed profile and write it to `wnfs`
+     * at the right path.
+     */
+    async profile (args?:newProfile):Promise<Profile> {
+        if (!args) {
+            // read and return existing profile
+            const path = wn.path.appData(
+                this.APP_INFO,
+                wn.path.file(this.PROFILE_PATH)
+            )
+
+            const profileData = await this.wnfs.read(path)
+            return JSON.parse(new TextDecoder().decode(profileData))
+        }
+
+        const profileArgs = {
+            humanName: args.humanName,
+            description: args.description,
+            author: await writeKeyToDid(this.program.components.crypto),
+            username: this.session.username,
+            rootDID: await rootDIDForUsername(this.program, this.session.username)
+        }
+        const { keystore } = this.program.components.crypto
+        const updatedProfile = await createProfile(keystore, profileArgs)
+        const profilePath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.file(this.PROFILE_PATH)
+        )
+
+        await this.wnfs.write(
+            profilePath,
+            new TextEncoder().encode(JSON.stringify(updatedProfile))
+        )
+
+        await this.wnfs.publish()
+
+        return updatedProfile
     }
 }
