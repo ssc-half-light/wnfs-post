@@ -60,7 +60,7 @@ const isValid = await verify(post.author, post)
 ### create a username
 This will create a unique 32 character string that will be used for DNS, and is unique per account (not per machine).
 
-```ts
+```js
 import * as wn from 'webnative'
 import { createUsername } from 'wnfs-post/util'
 
@@ -68,4 +68,32 @@ const program = await wn.program({
     namespace: { name: 'test', creator: 'test' }
 })
 const username = await createUsername(program)
+```
+
+### create a "profile"
+Create a profile object and write it to `wnfs`
+
+```js
+test('make a profile', async t => {
+    // call `.profile` with arguments, and it will write a profile to `wnfs`
+    const profile = await wnfsPosts.profile({
+        humanName: 'aaa',
+        description: 'look at my description'
+    })
+
+    t.equal(typeof profile.username, 'string', 'should have a username')
+    t.equal(profile.humanName, 'aaa', 'should have a human name')
+    t.equal(profile.description, 'look at my description',
+        'should have description')
+    t.equal(typeof profile.signature, 'string', 'should have a signature')
+    t.equal(profile.author, await writeKeyToDid(program.components.crypto),
+        'should set author to the DID that wrote the message')
+})
+```
+
+### read your profile
+Call `.profile` without any arguments, and it will read from `wnfs`
+
+```js
+const profile = await wnfsPosts.profile()
 ```

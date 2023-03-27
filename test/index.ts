@@ -11,11 +11,12 @@ const blob = new Blob(['ok'], {
 })
 const file = new File([blob], 'ok.jpg', { type: 'image/jpeg' })
 let wnfsPosts:WnfsPosts
+let program
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
 
-    const program = await wn.program({
+    program = await wn.program({
         namespace: APP_INFO,
         debug: true
     })
@@ -55,6 +56,8 @@ test('make a profile', async t => {
     t.equal(profile.description, 'look at my description',
         'should have description')
     t.equal(typeof profile.signature, 'string', 'should have a signature')
+    t.equal(profile.author, await writeKeyToDid(program.components.crypto),
+        'should set author to the DID that wrote the message')
 })
 
 test('read your own profile', async t => {
