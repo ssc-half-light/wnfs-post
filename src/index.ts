@@ -109,6 +109,20 @@ export class WnfsPosts {
         return newPost
     }
 
+    async writeProfile (profile:Profile):Promise<WnfsPosts> {
+        const profilePath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.file(this.PROFILE_PATH)
+        )
+
+        await this.wnfs.write(
+            profilePath,
+            new TextEncoder().encode(JSON.stringify(profile))
+        )
+
+        return this
+    }
+
     /**
      * @description Create a signed profile and write it to `wnfs`
      * at the right path.
