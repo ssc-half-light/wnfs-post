@@ -1,5 +1,4 @@
-# wnfs blobs
-
+# wnfs posts
 Use Fission as storage for post objects with associated blobs.
 
 ## install
@@ -16,7 +15,7 @@ npm i -S @nichoth/wnfs-post
 ```ts
 import { test } from 'tapzero'
 import { createDID, createUsername, verify } from 'wnfs-post/util'
-import { WnfsBlobs } from 'wnfs-post/index'
+import { WnfsPosts } from 'wnfs-post/index'
 
 test('make a post', async t => {
     const APP_INFO = { name: 'test', creator: 'test' }
