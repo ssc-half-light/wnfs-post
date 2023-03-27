@@ -3,25 +3,18 @@ import stringify from 'json-stable-stringify'
 import { Implementation } from 'webnative/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
-export interface Profile {
-    type: string,
-    humanName: string,
-    author: string,
-    username: string,
-    rootDID: string,
-    description?: string,
-    signature: string
-}
-
 interface ProfileArgs {
-    username: string
-    author: string
-    rootDID: string
     humanName: string
+    author: string
+    username: string
+    rootDID: string
     description?: string
 }
 
-// sbot.publish({type: 'about', about: yourId, description: description}, cb)
+export interface Profile extends ProfileArgs {
+    type: string,
+    signature: string
+}
 
 /**
  * @description Create a signed profile.

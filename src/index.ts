@@ -5,7 +5,7 @@ import { writeKeyToDid, rootDIDForUsername } from './util'
 
 interface newProfile {
     description?: string,
-    humanName: string
+    humanName: string,
 }
 
 interface newPostArgs {
