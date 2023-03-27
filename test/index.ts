@@ -63,4 +63,5 @@ test('read your own profile', async t => {
     t.equal(profile.type, 'about', 'should have "type: about" property')
     t.equal(profile.description, 'look at my description',
         'should have the right description')
+    t.ok(profile.author, 'should have author in profile')
 })
