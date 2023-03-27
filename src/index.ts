@@ -31,11 +31,14 @@ export class WnfsPosts {
     program: wn.Program
     session: wn.Session
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsPostsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, program }:wnfsPostsArgs) {
+        if (!program.session) throw new Error('missing session')
+        if (!program.session.fs) throw new Error('missing fs')
+
         this.program = program
-        this.session = session
+        this.session = program.session
         this.APP_INFO = APP_INFO
-        this.wnfs = wnfs
+        this.wnfs = program.session.fs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
         this.PROFILE_PATH = 'profile.json'
