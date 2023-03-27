@@ -110,7 +110,7 @@ export class WnfsPosts {
     }
 
     /**
-     * @description Create a signed profile and write it to your `wnfs`,
+     * @description Create a signed profile and write it to `wnfs`
      * at the right path.
      */
     async profile (args?:newProfile):Promise<Profile> {
@@ -133,9 +133,7 @@ export class WnfsPosts {
             rootDID: await rootDIDForUsername(this.program, this.session.username)
         }
         const { keystore } = this.program.components.crypto
-
         const updatedProfile = await createProfile(keystore, profileArgs)
-
         const profilePath = wn.path.appData(
             this.APP_INFO,
             wn.path.file(this.PROFILE_PATH)
