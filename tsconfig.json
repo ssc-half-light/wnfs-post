@@ -22,7 +22,6 @@
     "jsxFragmentFactory": "Fragment",
     "noImplicitAny": false,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "declarationDir": "dist",
     "declarationMap": true
   },
