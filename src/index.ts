@@ -119,6 +119,7 @@ export class WnfsPosts {
             profilePath,
             new TextEncoder().encode(JSON.stringify(profile))
         )
+        await this.wnfs.publish()
 
         return this
     }

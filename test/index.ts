@@ -1,6 +1,7 @@
 import { test } from 'tapzero'
 import { createUsername, verify } from '../src/util.js'
 import { WnfsPosts } from '../src/index.js'
+import { createProfile } from '../src/profile.js'
 import { writeKeyToDid } from '../src/util'
 
 // @ts-ignore
@@ -67,4 +68,22 @@ test('read your own profile', async t => {
     t.equal(profile.description, 'look at my description',
         'should have the right description')
     t.ok(profile.author, 'should have author in profile')
+})
+
+test('create a profile, then write it to disk', async t => {
+    const { keystore } = program.components.crypto
+    const profile = await createProfile(keystore, {
+        humanName: 'bbb',
+        author: await writeKeyToDid(program.components.crypto),
+        username: await createUsername(program),
+        rootDID: await writeKeyToDid(program.components.crypto),
+        description: 'wooo describing things'
+    })
+    t.ok(profile.signature, 'should sign the profile message')
+    await wnfsPosts.writeProfile(profile)
+})
+
+test('read the profile we just made', async t => {
+    const profile = await wnfsPosts.profile()
+    t.equal(profile.humanName, 'bbb', 'should return the new profile')
 })
