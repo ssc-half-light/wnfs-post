@@ -96,3 +96,25 @@ Call `.profile` without any arguments, and it will read from `wnfs`
 ```js
 const profile = await wnfsPosts.profile()
 ```
+
+### create a post, then write it
+
+```js
+test('create a profile, then write it to disk', async t => {
+    const { keystore } = program.components.crypto
+    const profile = await createProfile(keystore, {
+        humanName: 'bbb',
+        author: await writeKeyToDid(program.components.crypto),
+        username: await createUsername(program),
+        rootDID: await writeKeyToDid(program.components.crypto),
+        description: 'wooo describing things'
+    })
+    t.ok(profile.signature, 'should sign the profile message')
+    await wnfsPosts.writeProfile(profile)
+})
+
+test('read the profile we just made', async t => {
+    const profile = await wnfsPosts.profile()
+    t.equal(profile.humanName, 'bbb', 'should return the new profile')
+})
+```
