@@ -84,7 +84,11 @@ export function didToPublicKey (did:string): ({ publicKey:Uint8Array, type:strin
     }
 }
 
-export function rootDIDForUsername (program, username):Promise<string> {
+export function rootDIDForWnfs (program):string {
+    return program.session.fs.account.rootDID
+}
+
+export function rootDIDForUsername (program, username) {
     return program.components.reference.didRoot.lookup(username)
 }
 
