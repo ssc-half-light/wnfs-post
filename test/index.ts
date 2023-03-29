@@ -46,7 +46,7 @@ test('make a post', async t => {
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })
 
-test('make a profile', async t => {
+test('create and write a profile', async t => {
     const profile = await wnfsPosts.profile({
         humanName: 'aaa',
         description: 'look at my description'
