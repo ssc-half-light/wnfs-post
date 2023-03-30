@@ -14,15 +14,15 @@
     "postversion": "git push && git push --tags && npm publish",
     "prepublishOnly": "npm run build && tsc"
   },
-  "homepage": "https://github.com/nichoth/hermes-fission#readme",
+  "homepage": "https://github.com/ssc-hermes/wnfs-post#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nichoth/hermes-fission.git"
+    "url": "git+https://github.com/ssc-hermes/wnfs-post.git"
   },
   "author": "nichoth",
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/nichoth/hermes-fission/issues"
+    "url": "https://github.com/ssc-hermes/wnfs-post/issues"
   },
   "exports": {
     ".": {
