@@ -180,7 +180,7 @@ export class WnfsPosts {
         }
 
         const privateDirectoryPath = wn.path.directory('private', 'example', 'directory')
-        const shareDetails = this.wnfs.sharePrivate(
+        const shareDetails = await this.wnfs.sharePrivate(
             [privateDirectoryPath],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
