@@ -3,6 +3,7 @@ import type { Crypto } from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
 import { writeKeyToDid, rootDIDForWnfs } from './util'
+import { ShareDetails } from 'webnative/fs/types'
 
 interface newProfile {
     description?: string,
@@ -20,7 +21,8 @@ interface wnfsPostsArgs {
     wnfs: wn.FileSystem
     BLOB_DIR_PATH?: string
     crypto: Crypto.Implementation
-    session: wn.Session
+    username: string
+    program: wn.Program
 }
 
 export class WnfsPosts {
@@ -30,16 +32,18 @@ export class WnfsPosts {
     PROFILE_PATH:string
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
-    session: wn.Session
+    username: string
+    program: wn.Program
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, crypto, session }:wnfsPostsArgs) {
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, crypto, username, program }:wnfsPostsArgs) {
         this.crypto = crypto
-        this.session = session
+        this.username = username
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
         this.PROFILE_PATH = 'profile.json'
+        this.program = program
     }
 
     /**
@@ -81,7 +85,7 @@ export class WnfsPosts {
             text,
             alt,
             author,
-            username: this.session.username
+            username: this.username
         })
 
         const imgFilepath = wn.path.appData(
@@ -127,11 +131,9 @@ export class WnfsPosts {
 
     /**
      * @description Create a signed profile and write it to `wnfs`
-     * at the right path.
+     * at the right path, or read a Profile
      */
     async profile (args?:newProfile):Promise<Profile> {
-        if (!this.session.fs) throw new Error("There's no fs")
-
         if (!args) {
             // read and return existing profile
             const path = wn.path.appData(
@@ -147,7 +149,7 @@ export class WnfsPosts {
             humanName: args.humanName,
             description: args.description,
             author: await writeKeyToDid(this.crypto),
-            username: this.session.username,
+            username: this.username,
             rootDID: rootDIDForWnfs(this.wnfs)
         }
         const { keystore } = this.crypto
@@ -165,5 +167,25 @@ export class WnfsPosts {
         await this.wnfs.publish()
 
         return updatedProfile
+    }
+
+    /**
+     * @see [share private data]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#creating-a-share}
+     * @param recipient {string} the username you want to be friends with
+     * @returns {ShareDetails} share details
+     */
+    async requestFriendship (recipient:string):Promise<ShareDetails> {
+        if (!this.program.fileSystem.hasPublicExchangeKey(this.wnfs)) {
+            this.program.fileSystem.addPublicExchangeKey(this.wnfs)
+        }
+
+        const privateDirectoryPath = wn.path.directory('private', 'example', 'directory')
+        const shareDetails = this.wnfs.sharePrivate(
+            [privateDirectoryPath],
+            // alternative: list of usernames, or sharing/exchange DID(s)
+            { shareWith: recipient }
+        )
+
+        return shareDetails
     }
 }

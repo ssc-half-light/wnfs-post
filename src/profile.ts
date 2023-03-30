@@ -17,7 +17,7 @@ export interface Profile extends ProfileArgs {
 }
 
 /**
- * @description Create a signed profile.
+ * @description Create a signed profile, don't write anything.
  */
 export async function createProfile (keystore:KeyStore, args:ProfileArgs)
 :Promise<Profile> {

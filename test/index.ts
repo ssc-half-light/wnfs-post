@@ -33,13 +33,12 @@ test('make a post', async t => {
     t.ok(session, 'session should exist')
     t.ok(session.fs, 'session.fs should exist')
 
-    // console.log('session.fs', session.fs)
-
     wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
         crypto: program.components.crypto,
-        session
+        username: session.username,
+        program
     })
 
     const post = await wnfsPosts.post(file, {
