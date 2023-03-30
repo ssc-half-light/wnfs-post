@@ -25,7 +25,7 @@ test('make a post', async t => {
     t.ok(program, 'program exists')
 
     // *must* call `register` before we use the `session`
-    const username = await createUsername(program)
+    const username = await createUsername(program.components.crypto)
     const { success } = await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
 
@@ -83,7 +83,7 @@ test('create a profile, then write it to disk', async t => {
     const profile = await createProfile(keystore, {
         humanName: 'bbb',
         author: await writeKeyToDid(program.components.crypto),
-        username: await createUsername(program),
+        username: await createUsername(program.components.crypto),
         rootDID: await writeKeyToDid(program.components.crypto),
         description: 'wooo describing things'
     })

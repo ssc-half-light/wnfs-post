@@ -26,8 +26,8 @@ export function toString (arr:Uint8Array) {
     return uint8arrays.toString(arr, 'base64url')
 }
 
-export async function createUsername (program:wn.Program):Promise<string> {
-    const { crypto } = program.components
+// export async function createUsername (program:wn.Program):Promise<string> {
+export async function createUsername (crypto:Crypto.Implementation):Promise<string> {
     const did = await createDID(crypto)
     const normalizedDid = did.normalize('NFD')
     const hashedUsername = await BrowserCrypto.sha256(
