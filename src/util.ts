@@ -84,8 +84,8 @@ export function didToPublicKey (did:string): ({ publicKey:Uint8Array, type:strin
     }
 }
 
-export function rootDIDForWnfs (program):string {
-    return program.session.fs.account.rootDID
+export function rootDIDForWnfs (wnfs:wn.FileSystem):string {
+    return wnfs.account.rootDID
 }
 
 export function rootDIDForUsername (program, username) {

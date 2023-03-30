@@ -15,22 +15,30 @@ let wnfsPosts:WnfsPosts
 let program
 
 test('make a post', async t => {
-    const APP_INFO = { name: 'test', creator: 'test' }
+    const APP_INFO = { name: 'testing', creator: 'test' }
 
     program = await wn.program({
         namespace: APP_INFO,
         debug: true
     })
 
+    t.ok(program, 'program exists')
+
     // *must* call `register` before we use the `session`
     const username = await createUsername(program)
-    await program.auth.register({ username })
+    const { success } = await program.auth.register({ username })
     const session = program.session ?? await program.auth.session()
+
+    t.equal(success, true, 'should register a username')
+    t.ok(session, 'session should exist')
+    t.ok(session.fs, 'session.fs should exist')
+
+    // console.log('session.fs', session.fs)
 
     wnfsPosts = new WnfsPosts({
         wnfs: session.fs,
         APP_INFO,
-        program,
+        crypto: program.components.crypto,
         session
     })
 

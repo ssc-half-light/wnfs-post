@@ -1,4 +1,5 @@
 import * as wn from 'webnative'
+import type { Crypto } from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
 import { writeKeyToDid, rootDIDForWnfs } from './util'
@@ -18,7 +19,7 @@ interface wnfsPostsArgs {
     LOG_DIR_PATH?: string,
     wnfs: wn.FileSystem
     BLOB_DIR_PATH?: string
-    program: wn.Program
+    crypto: Crypto.Implementation
     session: wn.Session
 }
 
@@ -28,11 +29,11 @@ export class WnfsPosts {
     BLOB_DIR_PATH:string
     PROFILE_PATH:string
     wnfs:wn.FileSystem
-    program: wn.Program
+    crypto: Crypto.Implementation
     session: wn.Session
 
-    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, program, session }:wnfsPostsArgs) {
-        this.program = program
+    constructor ({ APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, crypto, session }:wnfsPostsArgs) {
+        this.crypto = crypto
         this.session = session
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
@@ -71,8 +72,8 @@ export class WnfsPosts {
             wn.path.file(this.LOG_DIR_PATH, n + '.json')
         )
 
-        const { keystore } = this.program.components.crypto
-        const author = await writeKeyToDid(this.program.components.crypto)
+        const { keystore } = this.crypto
+        const author = await writeKeyToDid(this.crypto)
 
         // write the JSON
         const newPost:Message = await createPost(keystore, {
@@ -129,6 +130,8 @@ export class WnfsPosts {
      * at the right path.
      */
     async profile (args?:newProfile):Promise<Profile> {
+        if (!this.session.fs) throw new Error("There's no fs")
+
         if (!args) {
             // read and return existing profile
             const path = wn.path.appData(
@@ -143,11 +146,11 @@ export class WnfsPosts {
         const profileArgs = {
             humanName: args.humanName,
             description: args.description,
-            author: await writeKeyToDid(this.program.components.crypto),
+            author: await writeKeyToDid(this.crypto),
             username: this.session.username,
-            rootDID: rootDIDForWnfs(this.program)
+            rootDID: rootDIDForWnfs(this.wnfs)
         }
-        const { keystore } = this.program.components.crypto
+        const { keystore } = this.crypto
         const updatedProfile = await createProfile(keystore, profileArgs)
         const profilePath = wn.path.appData(
             this.APP_INFO,
