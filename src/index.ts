@@ -1,8 +1,9 @@
 import * as wn from 'webnative'
+// declare type wn = typeof import('webnative')
 import type { Crypto } from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
-import { writeKeyToDid, rootDIDForWnfs } from './util'
+import { createUsername, writeKeyToDid, rootDIDForWnfs } from './util'
 import { ShareDetails } from 'webnative/fs/types'
 
 interface newProfile {
@@ -44,6 +45,29 @@ export class WnfsPosts {
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
         this.PROFILE_PATH = 'profile.json'
         this.program = program
+    }
+
+    static async create (webnative:(typeof wn), APP_INFO:wn.AppInfo) {
+        const program = await webnative.program({
+            namespace: APP_INFO,
+            debug: true
+        })
+
+        const username = await createUsername(program.components.crypto)
+        const { success } = await program.auth.register({ username })
+        if (!success) throw new Error('not success registering username')
+
+        const session = program.session ?? await program.auth.session()
+        if (!session) throw new Error('not session')
+        if (!session.fs) throw new Error('not session.fs')
+
+        return new WnfsPosts({
+            APP_INFO,
+            wnfs: session.fs,
+            crypto: program.components.crypto,
+            username: session.username,
+            program
+        })
     }
 
     /**
@@ -179,7 +203,7 @@ export class WnfsPosts {
             this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
-        const privateDirectoryPath = wn.path.directory('private', 'example', 'directory')
+        const privateDirectoryPath = wn.path.directory('private', 'friends')
         const shareDetails = await this.wnfs.sharePrivate(
             [privateDirectoryPath],
             // alternative: list of usernames, or sharing/exchange DID(s)
@@ -189,3 +213,18 @@ export class WnfsPosts {
         return shareDetails
     }
 }
+
+// newly added friend should get a default shared folder
+// we can add posts to it
+// __public data__
+//   * our profile data -- username, description, avatar
+//
+// __default shared data__
+//   * have a default/friends folder for every user
+//   * show who your other friends are (this will be configurable in the future)
+//   * 'friends' folder contains -- list of friends, photos added by user
+//
+// have a list of friends that is semi-private (shared with your friends)
+// have a 'friends' folder -- this will be the default way to make a post,
+//   it goes in the 'fiends' folder
+//
