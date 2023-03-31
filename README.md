@@ -118,3 +118,9 @@ test('read the profile we just made', async t => {
     t.equal(profile.humanName, 'bbb', 'should return the new profile')
 })
 ```
+
+## test
+Pass in the test file:
+```
+npm test -- test/index.ts
+```

@@ -6,3 +6,5 @@ public
 package-lock.json
 src/*.js
 test/*.js
+!test/build.js
+!test/run-tests.js
