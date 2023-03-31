@@ -8,42 +8,41 @@ npm i -S @nichoth/wnfs-post
 
 ## example
 
-### create a post
+### create
+Use `.create` to make a new instance because it is async
 
+```js
+import * as wn from 'webnative'
+const APP_INFO = { name: 'testing', creator: 'test' }
+const wnfsPosts = await WnfsPosts.create(wn, APP_INFO)
+```
+
+### create a post
 `wnfsPost.post` will write a given post and blob to your `wnfs` filesystem, and then return the post.
 
-```ts
+```js
+import * as wn from 'webnative'
 import { test } from 'tapzero'
-import { createDID, createUsername, verify } from 'wnfs-post/util'
-import { WnfsPosts } from 'wnfs-post/index'
+import { writeKeyToDid, createUsername, verify } from 'wnfs-post/util'
+import { WnfsPosts } from 'wnfs-post'
+import { createProfile } from 'wnfs-post/profile'
 
 test('make a post', async t => {
-    const APP_INFO = { name: 'test', creator: 'test' }
+    const APP_INFO = { name: 'testing', creator: 'test' }
 
-    const program = await wn.program({
-        namespace: APP_INFO
-    })
-
-    // *must* call `register` before we use the `session`
-    const username = await createUsername(program)
-    await program.auth.register({ username })
-    const session = program.session ?? await program.auth.session()
-
-    const wnfsPosts = new WnfsPosts({
-        wnfs: session.fs,
-        APP_INFO,
-        program
-    })
+    // use `.create` instead of `new` because it is async
+    const wnfsPosts = await WnfsPosts.create(wn, APP_INFO)
 
     const post = await wnfsPosts.post(file, {
         text: 'testing'
     })
 
-    t.equal(post.author, await writeKeyToDid(program.components.crypto),
+    t.ok(wnfsPosts, 'should create a wnfsPosts object')
+    t.equal(post.author, await writeKeyToDid(wnfsPosts.program.components.crypto),
         'should have the right author in the post')
-    t.ok(post.signature, 'should have a signature')
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
+    t.equal(post.username, wnfsPosts.username, 'should have the username in the post')
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })
 ```
@@ -100,6 +99,9 @@ const profile = await wnfsPosts.profile()
 ### create a post, then write it
 
 ```js
+import { test } from 'tapzero'
+import { createProfile } from 'wnfs-post/profile'
+
 test('create a profile, then write it to disk', async t => {
     const { keystore } = program.components.crypto
     const profile = await createProfile(keystore, {

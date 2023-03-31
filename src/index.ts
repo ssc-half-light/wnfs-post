@@ -26,7 +26,7 @@ interface wnfsPostsArgs {
     program: wn.Program
 }
 
-export class WnfsPosts {
+export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
@@ -54,6 +54,7 @@ export class WnfsPosts {
         })
 
         const username = await createUsername(program.components.crypto)
+        // *must* call `register` before we use the `session`
         const { success } = await program.auth.register({ username })
         if (!success) throw new Error('not success registering username')
 
@@ -61,7 +62,7 @@ export class WnfsPosts {
         if (!session) throw new Error('not session')
         if (!session.fs) throw new Error('not session.fs')
 
-        return new WnfsPosts({
+        return new WnfsPost({
             APP_INFO,
             wnfs: session.fs,
             crypto: program.components.crypto,
@@ -138,7 +139,7 @@ export class WnfsPosts {
         return newPost
     }
 
-    async writeProfile (profile:Profile):Promise<WnfsPosts> {
+    async writeProfile (profile:Profile):Promise<WnfsPost> {
         const profilePath = wn.path.appData(
             this.APP_INFO,
             wn.path.file(this.PROFILE_PATH)
@@ -203,6 +204,7 @@ export class WnfsPosts {
             this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
+        // @TODO -- what to do about directory names?
         const privateDirectoryPath = wn.path.directory('private', 'friends')
         const shareDetails = await this.wnfs.sharePrivate(
             [privateDirectoryPath],
@@ -211,6 +213,23 @@ export class WnfsPosts {
         )
 
         return shareDetails
+    }
+
+    //
+    // need to also share your own filepaths when you accept a friendship
+    //
+
+    /**
+     * @see [resolving a share]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#resolving-the-share}
+     * @param shareDetails {ShareDetails} The share details create by the other user
+     */
+    async acceptFriendship (shareDetails:ShareDetails):Promise<void> {
+        await this.wnfs.acceptShare({
+            shareId: shareDetails.shareId,
+            sharedBy: shareDetails.sharedBy.username
+        })
+        // when this happens, we need to call wnfs.sharePrivate(), and send
+        // our shareDetails to the other person
     }
 }
 

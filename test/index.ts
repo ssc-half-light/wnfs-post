@@ -1,6 +1,6 @@
 import { test } from 'tapzero'
 import { createUsername, verify } from '../src/util.js'
-import { WnfsPosts } from '../src/index.js'
+import { WnfsPost } from '../src/index.js'
 import { createProfile } from '../src/profile.js'
 import { writeKeyToDid } from '../src/util'
 
@@ -11,50 +11,28 @@ const blob = new Blob(['ok'], {
     type: 'image/jpeg',
 })
 const file = new File([blob], 'ok.jpg', { type: 'image/jpeg' })
-let wnfsPosts:WnfsPosts
-let program
+let wnfsPost:WnfsPost
 
 test('make a post', async t => {
     const APP_INFO = { name: 'testing', creator: 'test' }
 
-    program = await wn.program({
-        namespace: APP_INFO,
-        debug: true
-    })
+    wnfsPost = await WnfsPost.create(wn, APP_INFO)
 
-    t.ok(program, 'program exists')
-
-    // *must* call `register` before we use the `session`
-    const username = await createUsername(program.components.crypto)
-    const { success } = await program.auth.register({ username })
-    const session = program.session ?? await program.auth.session()
-
-    t.equal(success, true, 'should register a username')
-    t.ok(session, 'session should exist')
-    t.ok(session.fs, 'session.fs should exist')
-
-    wnfsPosts = new WnfsPosts({
-        wnfs: session.fs,
-        APP_INFO,
-        crypto: program.components.crypto,
-        username: session.username,
-        program
-    })
-
-    const post = await wnfsPosts.post(file, {
+    const post = await wnfsPost.post(file, {
         text: 'testing'
     })
 
-    t.equal(post.author, await writeKeyToDid(program.components.crypto),
+    t.ok(wnfsPost, 'should create a wnfsPosts object')
+    t.equal(post.author, await writeKeyToDid(wnfsPost.program.components.crypto),
         'should have the right author in the post')
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
-    t.equal(post.username, username, 'should have the username in the post')
+    t.equal(post.username, wnfsPost.username, 'should have the username in the post')
     t.equal(await verify(post.author, post), true, 'should verify the post')
 })
 
 test('create and write a profile', async t => {
-    const profile = await wnfsPosts.profile({
+    const profile = await wnfsPost.profile({
         humanName: 'aaa',
         description: 'look at my description'
     })
@@ -64,12 +42,12 @@ test('create and write a profile', async t => {
     t.equal(profile.description, 'look at my description',
         'should have description')
     t.equal(typeof profile.signature, 'string', 'should have a signature')
-    t.equal(profile.author, await writeKeyToDid(program.components.crypto),
+    t.equal(profile.author, await writeKeyToDid(wnfsPost.program.components.crypto),
         'should set author to the DID that wrote the message')
 })
 
 test('read your own profile', async t => {
-    const profile = await wnfsPosts.profile()
+    const profile = await wnfsPost.profile()
     t.ok(profile, 'should get profile')
     t.equal(profile.type, 'about', 'should have "type: about" property')
     t.equal(profile.description, 'look at my description',
@@ -78,19 +56,19 @@ test('read your own profile', async t => {
 })
 
 test('create a profile, then write it to disk', async t => {
-    const { keystore } = program.components.crypto
+    const { keystore } = wnfsPost.program.components.crypto
     const profile = await createProfile(keystore, {
         humanName: 'bbb',
-        author: await writeKeyToDid(program.components.crypto),
-        username: await createUsername(program.components.crypto),
-        rootDID: await writeKeyToDid(program.components.crypto),
+        author: await writeKeyToDid(wnfsPost.program.components.crypto),
+        username: await createUsername(wnfsPost.program.components.crypto),
+        rootDID: await writeKeyToDid(wnfsPost.program.components.crypto),
         description: 'wooo describing things'
     })
     t.ok(profile.signature, 'should sign the profile message')
-    await wnfsPosts.writeProfile(profile)
+    await wnfsPost.writeProfile(profile)
 })
 
 test('read the profile we just made', async t => {
-    const profile = await wnfsPosts.profile()
+    const profile = await wnfsPost.profile()
     t.equal(profile.humanName, 'bbb', 'should return the new profile')
 })
