@@ -26,6 +26,8 @@ interface wnfsPostsArgs {
     program: wn.Program
 }
 
+const FRIEND_DIR = wn.path.directory('private', 'friends')
+
 export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
@@ -63,6 +65,9 @@ export class WnfsPost {
         const session = program.session ?? await program.auth.session()
         if (!session) throw new Error('not session')
         if (!session.fs) throw new Error('not session.fs')
+
+        // create necessary directories
+        await session.fs.mkdir(FRIEND_DIR)
 
         return new WnfsPost({
             APP_INFO,
@@ -208,9 +213,8 @@ export class WnfsPost {
         }
 
         // @TODO -- what to do about directory names?
-        const privateDirectoryPath = wn.path.directory('private', 'friends')
         const shareDetails = await this.wnfs.sharePrivate(
-            [privateDirectoryPath],
+            [FRIEND_DIR],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
