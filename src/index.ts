@@ -198,7 +198,8 @@ export class WnfsPost {
 
     /**
      * @see [share private data]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#creating-a-share}
-     * @param recipient {string} the username you want to be friends with
+     * @param recipient {string} the machine-readable username you want to be
+     * friends with
      * @returns {ShareDetails} share details
      */
     async requestFriendship (recipient:string):Promise<ShareDetails> {
