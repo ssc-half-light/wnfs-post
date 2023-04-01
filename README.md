@@ -6,6 +6,18 @@ Use Fission as storage for post objects with associated blobs.
 npm i -S @nichoth/wnfs-post
 ```
 
+## test
+
+### Run tests with `test/index.ts`:
+```bash
+npm test
+```
+
+### Pass in the test file we run
+```bash
+npm test -- test/friendship.ts
+```
+
 ## example
 
 ### create

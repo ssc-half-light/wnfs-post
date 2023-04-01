@@ -214,14 +214,14 @@ export class WnfsPost {
             this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
-        // now there is a pending friendship
-        // wait for the recipient to accept
-
         const shareDetails = await this.wnfs.sharePrivate(
             [FRIEND_DIR],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
+
+        // now there is a pending friendship
+        // wait for the recipient to accept
 
         return shareDetails
     }
