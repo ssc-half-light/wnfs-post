@@ -1,6 +1,7 @@
 import { sign, toString } from './util.js'
 import stringify from 'json-stable-stringify'
 import { Implementation } from 'webnative/components/crypto/implementation'
+import timestamp from 'monotonic-timestamp'
 type KeyStore = Implementation['keystore']
 
 interface ProfileArgs {
@@ -13,6 +14,7 @@ interface ProfileArgs {
 
 export interface Profile extends ProfileArgs {
     type: string,
+    timestamp: number,
     signature: string
 }
 
@@ -25,6 +27,7 @@ export async function createProfile (keystore:KeyStore, args:ProfileArgs)
 
     return Object.assign(args, {
         type: 'about',
+        timestamp: timestamp(),
         signature: toString(await sign(keystore, stringify(args)))
     })
 }

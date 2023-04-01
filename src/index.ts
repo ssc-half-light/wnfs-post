@@ -206,13 +206,17 @@ export class WnfsPost {
      * @param recipient {string} the machine-readable username you want to be
      * friends with
      * @returns {ShareDetails} share details
+     * @description This will share your 'friends` directory with the given
+     * recipient, and request that they do the same
      */
     async requestFriendship (recipient:string):Promise<ShareDetails> {
         if (!this.program.fileSystem.hasPublicExchangeKey(this.wnfs)) {
             this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
-        // @TODO -- what to do about directory names?
+        // now there is a pending friendship
+        // wait for the recipient to accept
+
         const shareDetails = await this.wnfs.sharePrivate(
             [FRIEND_DIR],
             // alternative: list of usernames, or sharing/exchange DID(s)
@@ -225,18 +229,26 @@ export class WnfsPost {
     //
     // need to also share your own filepaths when you accept a friendship
     //
+    // we also call `wnfs.sharePrivate` and pass the username of the person
+    // who is accepting our share
+    //
 
     /**
      * @see [resolving a share]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#resolving-the-share}
-     * @param shareDetails {ShareDetails} The share details create by the other user
+     * @param shareDetails {ShareDetails} The share details created by the
+     * other user
      */
     async acceptFriendship (shareDetails:ShareDetails):Promise<void> {
         await this.wnfs.acceptShare({
             shareId: shareDetails.shareId,
             sharedBy: shareDetails.sharedBy.username
         })
+        // now we are friends
         // when this happens, we need to call wnfs.sharePrivate(), and send
-        // our shareDetails to the other person
+        // the returned `shareDetails` to the other person
+        // the other person then calls `wnfs.acceptShare` on our shareDetails
+        //
+        // can write to the DB under something like `pendingAccept`
     }
 }
 

@@ -13,6 +13,8 @@ test('request friendship', async t => {
     const details = await wnfsPosts.requestFriendship(
         'ensxz45kz4wlmbkm3o6e4x2cgbg7foxe')
 
-    console.log('details', details)
+    console.log('**details**', details)
     t.ok(details, 'returns share details')
+    t.equal(details.sharedBy.username, wnfsPosts.username,
+        'returns sharedBy username')
 })
