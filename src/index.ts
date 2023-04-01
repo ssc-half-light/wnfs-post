@@ -3,11 +3,17 @@ import * as wn from 'webnative'
 import type { Crypto } from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
-import { createUsername, writeKeyToDid, rootDIDForWnfs } from './util'
+import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
 import { ShareDetails } from 'webnative/fs/types'
+import stringify from 'json-stable-stringify'
 
-export interface FriendRequest extends ShareDetails {
+interface ReqValue extends ShareDetails {
     sharedTo: { username: string }
+}
+
+export interface FriendRequest {
+    value: ReqValue
+    signature: string
 }
 
 interface newProfile {
@@ -227,9 +233,15 @@ export class WnfsPost {
         // now there is a pending friendship
         // wait for the recipient to accept
 
-        return Object.assign(shareDetails, {
+        const { keystore } = this.program.components.crypto
+        const value = Object.assign(shareDetails, {
             sharedTo: { username: recipient }
         })
+
+        return {
+            value,
+            signature: toString(await sign(keystore, stringify(value)))
+        }
     }
 
     //
