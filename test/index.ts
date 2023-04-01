@@ -38,6 +38,7 @@ test('create and write a profile', async t => {
     })
 
     t.equal(typeof profile.username, 'string', 'should have a username')
+    t.ok(profile.timestamp, 'should have a timestamp')
     t.equal(profile.humanName, 'aaa', 'should have a human name')
     t.equal(profile.description, 'look at my description',
         'should have description')
