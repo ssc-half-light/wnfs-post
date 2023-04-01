@@ -12,9 +12,13 @@ interface ProfileArgs {
     description?: string
 }
 
-export interface Profile extends ProfileArgs {
+export interface ProfileValue extends ProfileArgs {
     type: string,
-    timestamp: number,
+    timestamp: number
+}
+
+export interface Profile {
+    value: ProfileValue,
     signature: string
 }
 
@@ -23,11 +27,8 @@ export interface Profile extends ProfileArgs {
  */
 export async function createProfile (keystore:KeyStore, args:ProfileArgs)
 :Promise<Profile> {
-    // const { username } = args
-
-    return Object.assign(args, {
-        type: 'about',
-        timestamp: timestamp(),
+    return {
+        value: Object.assign(args, { type: 'about', timestamp: timestamp() }),
         signature: toString(await sign(keystore, stringify(args)))
-    })
+    }
 }

@@ -37,23 +37,23 @@ test('create and write a profile', async t => {
         description: 'look at my description'
     })
 
-    t.equal(typeof profile.username, 'string', 'should have a username')
-    t.ok(profile.timestamp, 'should have a timestamp')
-    t.equal(profile.humanName, 'aaa', 'should have a human name')
-    t.equal(profile.description, 'look at my description',
+    t.equal(typeof profile.value.username, 'string', 'should have a username')
+    t.ok(profile.value.timestamp, 'should have a timestamp')
+    t.equal(profile.value.humanName, 'aaa', 'should have a human name')
+    t.equal(profile.value.description, 'look at my description',
         'should have description')
     t.equal(typeof profile.signature, 'string', 'should have a signature')
-    t.equal(profile.author, await writeKeyToDid(wnfsPost.program.components.crypto),
+    t.equal(profile.value.author, await writeKeyToDid(wnfsPost.program.components.crypto),
         'should set author to the DID that wrote the message')
 })
 
 test('read your own profile', async t => {
     const profile = await wnfsPost.profile()
     t.ok(profile, 'should get profile')
-    t.equal(profile.type, 'about', 'should have "type: about" property')
-    t.equal(profile.description, 'look at my description',
+    t.equal(profile.value.type, 'about', 'should have "type: about" property')
+    t.equal(profile.value.description, 'look at my description',
         'should have the right description')
-    t.ok(profile.author, 'should have author in profile')
+    t.ok(profile.value.author, 'should have author in profile')
 })
 
 test('create a profile, then write it to disk', async t => {
@@ -71,5 +71,5 @@ test('create a profile, then write it to disk', async t => {
 
 test('read the profile we just made', async t => {
     const profile = await wnfsPost.profile()
-    t.equal(profile.humanName, 'bbb', 'should return the new profile')
+    t.equal(profile.value.humanName, 'bbb', 'should return the new profile')
 })
