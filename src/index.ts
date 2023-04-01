@@ -8,6 +8,7 @@ import { ShareDetails } from 'webnative/fs/types'
 import stringify from 'json-stable-stringify'
 
 interface ReqValue extends ShareDetails {
+    author: string,
     sharedTo: { username: string }
 }
 
@@ -235,7 +236,8 @@ export class WnfsPost {
 
         const { keystore } = this.program.components.crypto
         const value = Object.assign(shareDetails, {
-            sharedTo: { username: recipient }
+            sharedTo: { username: recipient },
+            author: await writeKeyToDid(this.crypto)
         })
 
         return {
