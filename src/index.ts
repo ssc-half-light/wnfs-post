@@ -6,6 +6,10 @@ import { createProfile, Profile } from './profile'
 import { createUsername, writeKeyToDid, rootDIDForWnfs } from './util'
 import { ShareDetails } from 'webnative/fs/types'
 
+export interface FriendRequest extends ShareDetails {
+    sharedTo: { username: string }
+}
+
 interface newProfile {
     description?: string,
     humanName: string,
@@ -209,7 +213,7 @@ export class WnfsPost {
      * @description This will share your 'friends` directory with the given
      * recipient, and request that they do the same
      */
-    async requestFriendship (recipient:string):Promise<ShareDetails> {
+    async requestFriendship (recipient:string):Promise<FriendRequest> {
         if (!this.program.fileSystem.hasPublicExchangeKey(this.wnfs)) {
             this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
@@ -223,7 +227,9 @@ export class WnfsPost {
         // now there is a pending friendship
         // wait for the recipient to accept
 
-        return shareDetails
+        return Object.assign(shareDetails, {
+            sharedTo: { username: recipient }
+        })
     }
 
     //
