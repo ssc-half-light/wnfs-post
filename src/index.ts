@@ -216,7 +216,10 @@ export class WnfsPost {
      * @see [share private data]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#creating-a-share}
      * @param recipient {string} the machine-readable username you want to be
      * friends with
-     * @returns {ShareDetails} share details
+     * @returns {{
+     *   value: { ...ShareDetails, sharedTo, author },
+     *   signature
+     * }}
      * @description This will share your 'friends` directory with the given
      * recipient, and request that they do the same
      */
