@@ -42,7 +42,7 @@ export class WnfsPost {
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
     PROFILE_PATH:Path.FilePath<[Path.Partition, string, ...string[]]>
-    FRIENDS_LIST_PATH:Path.FilePath<string[]>
+    FRIENDS_LIST_PATH:Path.FilePath<['private', string, ...string[]]>
     FRIEND_DIR:Path.DirectoryPath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
@@ -55,18 +55,22 @@ export class WnfsPost {
         this.crypto = crypto
         this.username = username
         this.APP_INFO = APP_INFO
-        // this.FRIEND_DIR = wn.path.directory('private', 'friends')
         this.wnfs = wnfs
-        this.FRIEND_DIR = wn.path.directory('private', 'friends')
+        this.program = program
+        this.FRIEND_DIR = wn.path.appData(
+            this.APP_INFO,
+            wn.path.directory('friends')
+        )
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
-        // this.PROFILE_PATH = 'profile.json'
         this.PROFILE_PATH = wn.path.appData(
             this.APP_INFO,
             wn.path.file('profile.json')
         )
-        this.FRIENDS_LIST_PATH = wn.path.file('private', 'friends.json')
-        this.program = program
+        this.FRIENDS_LIST_PATH = wn.path.appData(
+            this.APP_INFO,
+            wn.path.file('friends.json')
+        )
     }
 
     static async create (webnative:(typeof wn), APP_INFO:wn.AppInfo) {
