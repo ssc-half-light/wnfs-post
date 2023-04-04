@@ -1,11 +1,11 @@
 import * as wn from 'webnative'
-// declare type wn = typeof import('webnative')
 import type { Crypto } from 'webnative'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
 import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
 import { ShareDetails } from 'webnative/fs/types'
 import stringify from 'json-stable-stringify'
+import * as Path from 'webnative/path/index'
 
 interface ReqValue extends ShareDetails {
     author: string,
@@ -37,13 +37,13 @@ interface wnfsPostsArgs {
     program: wn.Program
 }
 
-const FRIEND_DIR = wn.path.directory('private', 'friends')
-
 export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR_PATH:string
     BLOB_DIR_PATH:string
-    PROFILE_PATH:string
+    PROFILE_PATH:Path.FilePath<[Path.Partition, string, ...string[]]>
+    FRIENDS_LIST_PATH:Path.FilePath<string[]>
+    FRIEND_DIR:Path.DirectoryPath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
     username: string
@@ -55,10 +55,17 @@ export class WnfsPost {
         this.crypto = crypto
         this.username = username
         this.APP_INFO = APP_INFO
+        // this.FRIEND_DIR = wn.path.directory('private', 'friends')
         this.wnfs = wnfs
+        this.FRIEND_DIR = wn.path.directory('private', 'friends')
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
-        this.PROFILE_PATH = 'profile.json'
+        // this.PROFILE_PATH = 'profile.json'
+        this.PROFILE_PATH = wn.path.appData(
+            this.APP_INFO,
+            wn.path.file('profile.json')
+        )
+        this.FRIENDS_LIST_PATH = wn.path.file('private', 'friends.json')
         this.program = program
     }
 
@@ -77,16 +84,18 @@ export class WnfsPost {
         if (!session) throw new Error('not session')
         if (!session.fs) throw new Error('not session.fs')
 
-        // create necessary directories
-        await session.fs.mkdir(FRIEND_DIR)
-
-        return new WnfsPost({
+        const wnfsPost = new WnfsPost({
             APP_INFO,
             wnfs: session.fs,
             crypto: program.components.crypto,
             username: session.username,
             program
         })
+
+        // create necessary directories
+        await session.fs.mkdir(wnfsPost.FRIEND_DIR)
+
+        return wnfsPost
     }
 
     /**
@@ -158,13 +167,13 @@ export class WnfsPost {
     }
 
     async writeProfile (profile:Profile):Promise<WnfsPost> {
-        const profilePath = wn.path.appData(
-            this.APP_INFO,
-            wn.path.file(this.PROFILE_PATH)
-        )
+        // const profilePath = wn.path.appData(
+        //     this.APP_INFO,
+        //     wn.path.file(this.PROFILE_PATH)
+        // )
 
         await this.wnfs.write(
-            profilePath,
+            this.PROFILE_PATH,
             new TextEncoder().encode(JSON.stringify(profile))
         )
         await this.wnfs.publish()
@@ -179,12 +188,7 @@ export class WnfsPost {
     async profile (args?:newProfile):Promise<Profile> {
         if (!args) {
             // read and return existing profile
-            const path = wn.path.appData(
-                this.APP_INFO,
-                wn.path.file(this.PROFILE_PATH)
-            )
-
-            const profileData = await this.wnfs.read(path)
+            const profileData = await this.wnfs.read(this.PROFILE_PATH)
             return JSON.parse(new TextDecoder().decode(profileData))
         }
 
@@ -197,13 +201,9 @@ export class WnfsPost {
         }
         const { keystore } = this.crypto
         const updatedProfile = await createProfile(keystore, profileArgs)
-        const profilePath = wn.path.appData(
-            this.APP_INFO,
-            wn.path.file(this.PROFILE_PATH)
-        )
 
         await this.wnfs.write(
-            profilePath,
+            this.PROFILE_PATH,
             new TextEncoder().encode(JSON.stringify(updatedProfile))
         )
 
@@ -217,19 +217,19 @@ export class WnfsPost {
      * @param recipient {string} the machine-readable username you want to be
      * friends with
      * @returns {{
-     *   value: { ...ShareDetails, sharedTo, author },
+     *   value: { ...ShareDetails, sharedTo: { username }, author },
      *   signature
      * }}
      * @description This will share your 'friends` directory with the given
      * recipient, and request that they do the same
      */
     async requestFriendship (recipient:string):Promise<FriendRequest> {
-        if (!this.program.fileSystem.hasPublicExchangeKey(this.wnfs)) {
-            this.program.fileSystem.addPublicExchangeKey(this.wnfs)
+        if (!(await this.program.fileSystem.hasPublicExchangeKey(this.wnfs))) {
+            await this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
         const shareDetails = await this.wnfs.sharePrivate(
-            [FRIEND_DIR],
+            [this.FRIEND_DIR],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
@@ -266,6 +266,10 @@ export class WnfsPost {
             shareId: shareDetails.shareId,
             sharedBy: shareDetails.sharedBy.username
         })
+
+        // need to also share our private files with the other user
+        // wnfs.sharePrivate(other-username)
+
         // now we are friends
         // when this happens, we need to call wnfs.sharePrivate(), and send
         // the returned `shareDetails` to the other person
