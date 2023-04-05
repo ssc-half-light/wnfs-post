@@ -227,8 +227,18 @@ export class WnfsPost {
             await this.program.fileSystem.addPublicExchangeKey(this.wnfs)
         }
 
+        const blobPath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.directory(this.BLOB_DIR_PATH)
+        )
+
+        const logPath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.directory(this.LOG_DIR_PATH)
+        )
+
         const shareDetails = await this.wnfs.sharePrivate(
-            [this.FRIENDS_LIST_PATH],
+            [this.FRIENDS_LIST_PATH, blobPath, logPath],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
