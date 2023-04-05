@@ -97,6 +97,11 @@ export class WnfsPost {
             program
         })
 
+        if (await session.fs.exists(wnfsPost.FRIENDS_LIST_PATH)) {
+            // if we already have a friend list, don't overwrite it
+            return wnfsPost
+        }
+
         // create necessary directories and files
         await session.fs.write(
             wnfsPost.FRIENDS_LIST_PATH,
@@ -230,6 +235,11 @@ export class WnfsPost {
         return friendList
     }
 
+    /**
+     * @description Add to your list of friends
+     * @param newFriends {Friend[]} the new friends to add
+     * @returns newList {Promise<Friend[]>}
+     */
     async addFriends (newFriends:Friend[]):Promise<Friend[]> {
         const friendList = JSON.parse(new TextDecoder().decode(
             await this.wnfs.read(this.FRIENDS_LIST_PATH)
