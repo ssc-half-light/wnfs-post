@@ -230,6 +230,19 @@ export class WnfsPost {
         return friendList
     }
 
+    async addFriends (newFriends:Friend[]):Promise<Friend[]> {
+        const friendList = JSON.parse(new TextDecoder().decode(
+            await this.wnfs.read(this.FRIENDS_LIST_PATH)
+        ))
+        const newList = friendList.concat(newFriends)
+        await this.wnfs.write(
+            this.FRIENDS_LIST_PATH,
+            new TextEncoder().encode(newList)
+        )
+
+        return newList
+    }
+
     /**
      * @see [share private data]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#creating-a-share}
      * @param recipient {string} the machine-readable username you want to be
