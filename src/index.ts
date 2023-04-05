@@ -12,6 +12,12 @@ interface ReqValue extends ShareDetails {
     sharedTo: { username: string }
 }
 
+export interface Friend {
+    username:string,
+    humanName:string,
+    rootDID:string
+}
+
 export interface FriendRequest {
     value: ReqValue
     signature: string
@@ -91,8 +97,11 @@ export class WnfsPost {
             program
         })
 
-        // create necessary directories
-        // await session.fs.mkdir(wnfsPost.FRIEND_DIR)
+        // create necessary directories and files
+        await session.fs.write(
+            wnfsPost.FRIENDS_LIST_PATH,
+            new TextEncoder().encode(JSON.stringify([]))
+        )
 
         return wnfsPost
     }
@@ -209,6 +218,16 @@ export class WnfsPost {
         await this.wnfs.publish()
 
         return updatedProfile
+    }
+
+    /**
+     * @description Read the private list of your friends
+     * @returns A list of your friends
+     */
+    async friends ():Promise<Friend[]> {
+        const _friendList = await this.wnfs.read(this.FRIENDS_LIST_PATH)
+        const friendList = JSON.parse(new TextDecoder().decode(_friendList))
+        return friendList
     }
 
     /**
