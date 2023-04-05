@@ -43,7 +43,6 @@ export class WnfsPost {
     BLOB_DIR_PATH:string
     PROFILE_PATH:Path.FilePath<[Path.Partition, string, ...string[]]>
     FRIENDS_LIST_PATH:Path.FilePath<['private', string, ...string[]]>
-    FRIEND_DIR:Path.DirectoryPath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
     username: string
@@ -57,10 +56,6 @@ export class WnfsPost {
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.program = program
-        this.FRIEND_DIR = wn.path.appData(
-            this.APP_INFO,
-            wn.path.directory('friends')
-        )
         this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
         this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
         this.PROFILE_PATH = wn.path.appData(
@@ -97,7 +92,7 @@ export class WnfsPost {
         })
 
         // create necessary directories
-        await session.fs.mkdir(wnfsPost.FRIEND_DIR)
+        // await session.fs.mkdir(wnfsPost.FRIEND_DIR)
 
         return wnfsPost
     }
@@ -233,7 +228,7 @@ export class WnfsPost {
         }
 
         const shareDetails = await this.wnfs.sharePrivate(
-            [this.FRIEND_DIR],
+            [this.FRIENDS_LIST_PATH],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
