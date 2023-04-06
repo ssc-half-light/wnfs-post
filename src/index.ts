@@ -35,9 +35,9 @@ interface newPostArgs {
 
 interface wnfsPostsArgs {
     APP_INFO:{ name:string, creator:string }
-    LOG_DIR_PATH?: string,
+    LOG_DIR?: string,
     wnfs: wn.FileSystem
-    BLOB_DIR_PATH?: string
+    BLOB_DIR?: string
     crypto: Crypto.Implementation
     username: string
     program: wn.Program
@@ -45,9 +45,9 @@ interface wnfsPostsArgs {
 
 export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
-    LOG_DIR_PATH:string
-    BLOB_DIR_PATH:string
-    PROFILE_PATH:Path.FilePath<[Path.Partition, string, ...string[]]>
+    LOG_DIR:string
+    BLOB_DIR:string
+    PROFILE_PATH:Path.FilePath<['private', string, ...string[]]>
     FRIENDS_LIST_PATH:Path.FilePath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
@@ -55,15 +55,15 @@ export class WnfsPost {
     program: wn.Program
 
     constructor ({
-        APP_INFO, LOG_DIR_PATH, BLOB_DIR_PATH, wnfs, crypto, username, program
+        APP_INFO, LOG_DIR, BLOB_DIR, wnfs, crypto, username, program
     }:wnfsPostsArgs) {
         this.crypto = crypto
         this.username = username
         this.APP_INFO = APP_INFO
         this.wnfs = wnfs
         this.program = program
-        this.LOG_DIR_PATH = LOG_DIR_PATH || 'log'
-        this.BLOB_DIR_PATH = BLOB_DIR_PATH || 'blob'
+        this.LOG_DIR = LOG_DIR || 'log'
+        this.BLOB_DIR = BLOB_DIR || 'blob'
         this.PROFILE_PATH = wn.path.appData(
             this.APP_INFO,
             wn.path.file('profile.json')
@@ -97,8 +97,8 @@ export class WnfsPost {
             program
         })
 
+        // if we already have a friend list, don't overwrite it
         if (await session.fs.exists(wnfsPost.FRIENDS_LIST_PATH)) {
-            // if we already have a friend list, don't overwrite it
             return wnfsPost
         }
 
@@ -123,7 +123,7 @@ export class WnfsPost {
     async post (file:File, { text, alt }:newPostArgs):Promise<Message> {
         const logPath = wn.path.appData(
             this.APP_INFO,
-            wn.path.directory(this.LOG_DIR_PATH)
+            wn.path.directory(this.LOG_DIR)
         )
 
         await this.wnfs.mkdir(logPath)
@@ -138,7 +138,7 @@ export class WnfsPost {
         // posts are like /log-dir/1.json
         const newPostPath = wn.path.appData(
             this.APP_INFO,
-            wn.path.file(this.LOG_DIR_PATH, n + '.json')
+            wn.path.file(this.LOG_DIR, n + '.json')
         )
 
         const { keystore } = this.crypto
@@ -156,7 +156,7 @@ export class WnfsPost {
         const imgFilepath = wn.path.appData(
             this.APP_INFO,
             // __@TODO__ -- handle other file extensions
-            wn.path.file(this.BLOB_DIR_PATH, n + '-0.jpg')
+            wn.path.file(this.BLOB_DIR, n + '-0.jpg')
             // ^ we are only supporting single image per post right now
         )
 
@@ -226,7 +226,7 @@ export class WnfsPost {
     }
 
     /**
-     * @description Read the private list of your friends
+     * @description Get the private list of your friends
      * @returns A list of your friends
      */
     async friends ():Promise<Friend[]> {
@@ -271,16 +271,16 @@ export class WnfsPost {
 
         const blobPath = wn.path.appData(
             this.APP_INFO,
-            wn.path.directory(this.BLOB_DIR_PATH)
+            wn.path.directory(this.BLOB_DIR)
         )
 
         const logPath = wn.path.appData(
             this.APP_INFO,
-            wn.path.directory(this.LOG_DIR_PATH)
+            wn.path.directory(this.LOG_DIR)
         )
 
         const shareDetails = await this.wnfs.sharePrivate(
-            [this.FRIENDS_LIST_PATH, blobPath, logPath],
+            [this.FRIENDS_LIST_PATH, blobPath, logPath, this.PROFILE_PATH],
             // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
