@@ -9,8 +9,7 @@ import * as Path from 'webnative/path/index'
 
 interface ReqValue extends ShareDetails {
     author: string,
-    sharedTo: { username: string },
-    sharedFrom: { username: string }
+    sharedTo: { username: string }
 }
 
 export interface Friend {
@@ -290,9 +289,8 @@ export class WnfsPost {
         // wait for the recipient to accept
 
         const { keystore } = this.program.components.crypto
-        const value = Object.assign(shareDetails, {
+        const value:ReqValue = Object.assign(shareDetails, {
             sharedTo: { username: recipient },
-            sharedFrom: { username: this.username },
             author: await writeKeyToDid(this.crypto)
         })
 
