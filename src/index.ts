@@ -179,19 +179,14 @@ export class WnfsPost {
         return newPost
     }
 
-    async writeProfile (profile:Profile):Promise<WnfsPost> {
-        // const profilePath = wn.path.appData(
-        //     this.APP_INFO,
-        //     wn.path.file(this.PROFILE_PATH)
-        // )
-
+    async writeProfile (profile:Profile):Promise<Profile> {
         await this.wnfs.write(
             this.PROFILE_PATH,
             new TextEncoder().encode(JSON.stringify(profile))
         )
         await this.wnfs.publish()
 
-        return this
+        return profile
     }
 
     /**
