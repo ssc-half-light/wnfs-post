@@ -313,6 +313,8 @@ export class WnfsPost {
             sharedBy: shareDetails.sharedBy.username
         })
 
+        // add them to our list of friends
+
         // need to also share our private files with the other user
         // wnfs.sharePrivate(other-username)
 
