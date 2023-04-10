@@ -283,6 +283,10 @@ export class WnfsPost {
         // now there is a pending friendship
         // wait for the recipient to accept
 
+        // fs.acceptShare({
+        //   shareId: shareDetails.shareId,
+        //   sharedBy: shareDetails.sharedBy.username
+        // })
         const { keystore } = this.program.components.crypto
         const value:ReqValue = Object.assign(shareDetails, {
             sharedTo: { username: recipient },
@@ -307,7 +311,7 @@ export class WnfsPost {
      * @param shareDetails {ShareDetails} The share details created by the
      * other user
      */
-    async acceptFriendship (shareDetails:ShareDetails):Promise<void> {
+    async acceptFriendship (shareDetails:{ shareId, sharedBy }):Promise<void> {
         await this.wnfs.acceptShare({
             shareId: shareDetails.shareId,
             sharedBy: shareDetails.sharedBy.username
