@@ -1,7 +1,7 @@
 import stringify from 'json-stable-stringify'
 import { sign, toString } from './util.js'
 import timestamp from 'monotonic-timestamp'
-import { Implementation } from 'webnative/components/crypto/implementation'
+import { Implementation } from '@oddjs/odd/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
 interface newPostArgs {

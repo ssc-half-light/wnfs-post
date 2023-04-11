@@ -1,6 +1,6 @@
 import { sign, toString } from './util.js'
 import stringify from 'json-stable-stringify'
-import { Implementation } from 'webnative/components/crypto/implementation'
+import { Implementation } from '@oddjs/odd/components/crypto/implementation'
 import timestamp from 'monotonic-timestamp'
 type KeyStore = Implementation['keystore']
 
