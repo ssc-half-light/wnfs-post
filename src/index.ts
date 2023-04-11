@@ -7,7 +7,7 @@ import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 
-interface ReqValue extends ShareDetails {
+interface RequestValue extends ShareDetails {
     author: string,
     sharedTo: { username: string }
 }
@@ -19,7 +19,7 @@ export interface Friend {
 }
 
 export interface FriendRequest {
-    value: ReqValue
+    value: RequestValue
     signature: string
 }
 
@@ -276,7 +276,6 @@ export class WnfsPost {
 
         const shareDetails = await this.wnfs.sharePrivate(
             [this.FRIENDS_LIST_PATH, blobPath, logPath, this.PROFILE_PATH],
-            // alternative: list of usernames, or sharing/exchange DID(s)
             { shareWith: recipient }
         )
 
@@ -288,7 +287,7 @@ export class WnfsPost {
         //   sharedBy: shareDetails.sharedBy.username
         // })
         const { keystore } = this.program.components.crypto
-        const value:ReqValue = Object.assign(shareDetails, {
+        const value:RequestValue = Object.assign(shareDetails, {
             sharedTo: { username: recipient },
             author: await writeKeyToDid(this.crypto)
         })
@@ -307,9 +306,11 @@ export class WnfsPost {
     //
 
     /**
-     * @see [resolving a share]{@link https://guide.fission.codes/developers/webnative/sharing-private-data#resolving-the-share}
-     * @param shareDetails {ShareDetails} The share details created by the
-     * other user
+     * @see {@link https://guide.fission.codes/developers/webnative/sharing-private-data#resolving-the-share | resolving a share}
+     * @param shareDetails {ShareDetails} The share details created by the person
+     * requesting the friendship
+     * @returns {Promise<ShareDetails>} The share details for the 'acceptor',
+     * which should be accepted by the requester.
      */
     async acceptFriendship (shareDetails:{ shareId, sharedBy }):Promise<ShareDetails> {
         await this.wnfs.acceptShare({
@@ -332,21 +333,17 @@ export class WnfsPost {
             { shareWith: shareDetails.sharedBy.username }
         )
 
-        return myShareDetails
-
         //
         // + add them to our list of friends
+        //   should add a profile for friend
         //
+        await this.addFriends([])
 
-        // need to also share our private files with the other user
-        // wnfs.sharePrivate(other-username)
+        return myShareDetails
 
-        // now we are friends
-        // when this happens, we need to call wnfs.sharePrivate(), and send
-        // the returned `shareDetails` to the other person
+        // once the other accepts our friendship shares, we are friends
+        // need to  send the returned `shareDetails` to the other person
         // the other person then calls `wnfs.acceptShare` on our shareDetails
-        //
-        // can write to the DB under something like `pendingAccept`
     }
 }
 
