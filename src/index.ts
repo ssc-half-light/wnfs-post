@@ -1,11 +1,11 @@
-import * as wn from 'webnative'
-import type { Crypto } from 'webnative'
+import * as wn from '@oddjs/odd'
+import type { Crypto } from '@oddjs/odd'
 import { Message, createPost } from './post'
 import { createProfile, Profile } from './profile'
 import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
-import { ShareDetails } from 'webnative/fs/types'
+import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
-import * as Path from 'webnative/path/index'
+import * as Path from '@oddjs/odd/path/index'
 
 interface ReqValue extends ShareDetails {
     author: string,
@@ -311,13 +311,32 @@ export class WnfsPost {
      * @param shareDetails {ShareDetails} The share details created by the
      * other user
      */
-    async acceptFriendship (shareDetails:{ shareId, sharedBy }):Promise<void> {
+    async acceptFriendship (shareDetails:{ shareId, sharedBy }):Promise<ShareDetails> {
         await this.wnfs.acceptShare({
             shareId: shareDetails.shareId,
             sharedBy: shareDetails.sharedBy.username
         })
 
-        // add them to our list of friends
+        const blobPath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.directory(this.BLOB_DIR)
+        )
+
+        const logPath = wn.path.appData(
+            this.APP_INFO,
+            wn.path.directory(this.LOG_DIR)
+        )
+
+        const myShareDetails = await this.wnfs.sharePrivate(
+            [this.FRIENDS_LIST_PATH, blobPath, logPath, this.PROFILE_PATH],
+            { shareWith: shareDetails.sharedBy.username }
+        )
+
+        return myShareDetails
+
+        //
+        // + add them to our list of friends
+        //
 
         // need to also share our private files with the other user
         // wnfs.sharePrivate(other-username)

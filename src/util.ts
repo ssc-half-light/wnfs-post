@@ -1,11 +1,11 @@
 import * as uint8arrays from 'uint8arrays'
-import type { Crypto } from 'webnative'
-import { publicKeyToDid } from 'webnative/did/transformers'
-import * as BrowserCrypto from 'webnative/components/crypto/implementation/browser'
-import * as wn from 'webnative'
+import type { Crypto } from '@oddjs/odd'
+import { publicKeyToDid } from '@oddjs/odd/did/transformers'
+import * as BrowserCrypto from '@oddjs/odd/components/crypto/implementation/browser'
+import { Implementation } from '@oddjs/odd/components/crypto/implementation'
+import * as wn from '@oddjs/odd'
 import stringify from 'json-stable-stringify'
 import { Message } from './post'
-import { Implementation } from 'webnative/components/crypto/implementation'
 type KeyStore = Implementation['keystore']
 
 const KEY_TYPE = {
