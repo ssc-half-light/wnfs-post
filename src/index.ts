@@ -12,6 +12,13 @@ interface RequestValue extends ShareDetails {
     sharedTo: { username: string }
 }
 
+export interface AcceptedFriendship {
+    type:string,
+    requestFrom:string,
+    acceptor:string,
+    acceptorShareDetails:ShareDetails
+}
+
 export interface Friend {
     username:string,
     humanName:string,
@@ -337,7 +344,6 @@ export class WnfsPost {
         // + add them to our list of friends
         //   should add a profile for friend
         //
-        await this.addFriends([])
 
         return myShareDetails
 
