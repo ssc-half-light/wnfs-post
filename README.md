@@ -77,7 +77,7 @@ import { createUsername } from 'wnfs-post/util'
 const program = await wn.program({
     namespace: { name: 'test', creator: 'test' }
 })
-const username = await createUsername(program)
+const username = await createUsername(program.components.crypto)
 ```
 
 ### create a "profile"
