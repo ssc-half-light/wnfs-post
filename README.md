@@ -21,7 +21,7 @@ npm test -- test/friendship.ts
 ## example
 
 ### create
-Use `.create` to make a new instance because it is async
+Use `.create`, not the constructor, to make a new instance, because it is async
 
 ```js
 import * as wn from 'webnative'
