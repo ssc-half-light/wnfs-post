@@ -13,7 +13,7 @@ npm i -S @nichoth/wnfs-post
 npm test
 ```
 
-### Pass in the test file we run
+### Pass in the test file to run
 ```bash
 npm test -- test/friendship.ts
 ```
