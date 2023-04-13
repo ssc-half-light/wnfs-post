@@ -108,7 +108,7 @@ Call `.profile` without any arguments, and it will read from `wnfs`
 const profile = await wnfsPosts.profile()
 ```
 
-### create a post, then write it
+### create a profile, then write it
 
 ```js
 import { test } from 'tapzero'
