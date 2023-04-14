@@ -125,7 +125,7 @@ test('read your own profile', async t => {
 import { WnfsPost } from 'wnfs-post'
 import { test } from 'tapzero'
 import { createProfile } from 'wnfs-post/profile'
-import { writeKeyToDid } from 'wnfs-post/util'
+import { writeKeyToDid, createUsername } from 'wnfs-post/util'
 
 test('create a profile, then write it to disk', async t => {
     const wnfsPost = await WnfsPost.create(wn, APP_INFO)
