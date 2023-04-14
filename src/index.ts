@@ -7,11 +7,6 @@ import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 
-interface RequestValue extends ShareDetails {
-    author: string,
-    sharedTo: { username: string }
-}
-
 export interface AcceptedFriendship {
     type:string,
     requestFrom:string,
@@ -25,8 +20,13 @@ export interface Friend {
     rootDID:string
 }
 
+interface RequestValue extends ShareDetails {
+    author: string,
+    sharedTo: { username: string }
+}
+
 export interface FriendRequest {
-    value: RequestValue
+    value: RequestValue,
     signature: string
 }
 
