@@ -84,19 +84,23 @@ const username = await createUsername(program.components.crypto)
 Create a profile object and write it to `wnfs`
 
 ```js
-test('make a profile', async t => {
-    // call `.profile` with arguments, and it will write a profile to `wnfs`
-    const profile = await wnfsPosts.profile({
+import { writeKeyToDid } from 'wnfs-post/util'
+
+test('create and write a profile', async t => {
+    const wnfsPost = await WnfsPost.create(wn, APP_INFO)
+    const { crypto } = wnfsPost.program.components
+    const profile = await wnfsPost.profile({
         humanName: 'aaa',
         description: 'look at my description'
     })
 
-    t.equal(typeof profile.username, 'string', 'should have a username')
-    t.equal(profile.humanName, 'aaa', 'should have a human name')
-    t.equal(profile.description, 'look at my description',
+    t.equal(typeof profile.value.username, 'string', 'should have a username')
+    t.ok(profile.value.timestamp, 'should have a timestamp')
+    t.equal(profile.value.humanName, 'aaa', 'should have a human name')
+    t.equal(profile.value.description, 'look at my description',
         'should have description')
     t.equal(typeof profile.signature, 'string', 'should have a signature')
-    t.equal(profile.author, await writeKeyToDid(program.components.crypto),
+    t.equal(profile.value.author, await writeKeyToDid(crypto),
         'should set author to the DID that wrote the message')
 })
 ```
@@ -105,30 +109,41 @@ test('make a profile', async t => {
 Call `.profile` without any arguments, and it will read from `wnfs`
 
 ```js
-const profile = await wnfsPosts.profile()
+test('read your own profile', async t => {
+    const profile = await wnfsPost.profile()
+    t.ok(profile, 'should get profile')
+    t.equal(profile.value.type, 'about', 'should have "type: about" property')
+    t.equal(profile.value.description, 'look at my description',
+        'should have the right description')
+    t.ok(profile.value.author, 'should have author in profile')
+})
 ```
 
 ### create a profile, then write it
 
 ```js
+import { WnfsPost } from 'wnfs-post'
 import { test } from 'tapzero'
 import { createProfile } from 'wnfs-post/profile'
+import { writeKeyToDid } from 'wnfs-post/util'
 
 test('create a profile, then write it to disk', async t => {
-    const { keystore } = program.components.crypto
+    const wnfsPost = await WnfsPost.create(wn, APP_INFO)
+    const { crypto } = wnfsPost.program.components
+    const { keystore } = crypto
     const profile = await createProfile(keystore, {
         humanName: 'bbb',
-        author: await writeKeyToDid(program.components.crypto),
-        username: await createUsername(program),
-        rootDID: await writeKeyToDid(program.components.crypto),
+        author: await writeKeyToDid(crypto),
+        username: await createUsername(crypto),
+        rootDID: await writeKeyToDid(crypto),
         description: 'wooo describing things'
     })
     t.ok(profile.signature, 'should sign the profile message')
-    await wnfsPosts.writeProfile(profile)
+    await wnfsPost.writeProfile(profile)
 })
 
 test('read the profile we just made', async t => {
-    const profile = await wnfsPosts.profile()
-    t.equal(profile.humanName, 'bbb', 'should return the new profile')
+    const profile = await wnfsPost.profile()
+    t.equal(profile.value.humanName, 'bbb', 'should return the new profile')
 })
 ```
