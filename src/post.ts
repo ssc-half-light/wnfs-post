@@ -6,25 +6,26 @@ type KeyStore = Implementation['keystore']
 
 interface newPostArgs {
     sequence: number,  // post sequence number
-    alt?: string,  // alt text for image
     author: string  // author DID
-    text: string  // message text
     username: string  // DNS username
+    alt?: string,  // alt text for image
+    text: string  // message text
 }
 
 export interface Message {
     sequence: number,
-    timestamp: number,
     author: string,
     username: string,
     content: { type:string, text:string, alt:string, mentions: string[] }
+    timestamp: number,
     signature: string
 }
 
 /**
  * @description Create a signed post from given content.
  */
-export async function createPost (keystore:KeyStore, args:newPostArgs):Promise<Message> {
+export async function createPost (keystore:KeyStore, args:newPostArgs):
+Promise<Message> {
     const { sequence, text, alt, author, username } = args
 
     const unsignedMsg = {

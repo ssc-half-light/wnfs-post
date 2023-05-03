@@ -128,6 +128,13 @@ export class WnfsPost {
      * `alt` text attribute for the image
      */
     async post (file:File, { text, alt }:newPostArgs):Promise<Message> {
+        //
+        // images for each post are related via naming convention
+        //   so post with seq 1 would have an image file like `1-1.jpg`
+        //
+
+        const ext = file.name.split('.').pop()?.toLowerCase()
+
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR)
@@ -162,8 +169,8 @@ export class WnfsPost {
 
         const imgFilepath = wn.path.appData(
             this.APP_INFO,
-            // __@TODO__ -- handle other file extensions
-            wn.path.file(this.BLOB_DIR, n + '-0.jpg')
+            // filename is like `postSeqNumber-imageNumber.jpg`
+            wn.path.file(this.BLOB_DIR, n + '-0' + '.' + ext)
             // ^ we are only supporting single image per post right now
         )
 
