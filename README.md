@@ -37,7 +37,6 @@ import * as wn from 'webnative'
 import { test } from 'tapzero'
 import { writeKeyToDid, createUsername, verify } from 'wnfs-post/util'
 import { WnfsPosts } from 'wnfs-post'
-import { createProfile } from 'wnfs-post/profile'
 
 test('make a post', async t => {
     const APP_INFO = { name: 'testing', creator: 'test' }
