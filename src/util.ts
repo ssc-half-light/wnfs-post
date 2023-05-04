@@ -43,15 +43,6 @@ async function createDID (crypto: Crypto.Implementation): Promise<string> {
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }
 
-export async function writeKeyToDid (crypto: Crypto.Implementation)
-:Promise<string> {
-    const [pubKey, ksAlg] = await Promise.all([
-        await crypto.keystore.publicWriteKey(),
-        await crypto.keystore.getAlgorithm()
-    ])
-    return publicKeyToDid(crypto, pubKey, ksAlg)
-}
-
 export const verify = async (did:string, msg:Message) => {
     const { publicKey, type } = didToPublicKey(did)
     const keyType = BrowserCrypto.did.keyTypes[type]

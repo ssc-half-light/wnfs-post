@@ -6,7 +6,8 @@ import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 import { SignedRequest } from '@ssc-hermes/message'
-import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
+import { writeKeyToDid } from '@ssc-hermes/util'
+import { createUsername, rootDIDForWnfs, sign, toString } from './util'
 import { createProfile, Profile } from './profile'
 
 export interface AcceptedFriendship {
@@ -210,7 +211,7 @@ export class WnfsPost {
      * @description Create a signed profile and write it to `wnfs`
      * at the right path, or read a Profile
      */
-    async profile (args?:newProfile):Promise<SignedRequest<Profile>> {
+    async profile (args?:newProfile):Promise<SignedRequest<Profile & {timestamp:number}>> {
         if (!args) {
             // read and return existing profile
             const profileData = await this.wnfs.read(this.PROFILE_PATH)
@@ -218,13 +219,13 @@ export class WnfsPost {
         }
 
         const profileArgs = {
+            username: this.username,
             humanName: args.humanName,
             description: args.description,
             author: await writeKeyToDid(this.crypto),
-            username: this.username,
             rootDID: rootDIDForWnfs(this.wnfs)
         }
-        // const { keystore } = this.crypto
+
         const updatedProfile = await createProfile(this.crypto, profileArgs)
 
         await this.wnfs.write(
