@@ -1,8 +1,8 @@
 import { test } from 'tapzero'
+import { writeKeyToDid } from '@ssc-hermes/util'
 import { createUsername, verify } from '../src/util.js'
 import { WnfsPost } from '../src/index.js'
 import { createProfile } from '../src/profile.js'
-import { writeKeyToDid } from '@ssc-hermes/util'
 
 // @ts-ignore
 const wn = self.oddjs

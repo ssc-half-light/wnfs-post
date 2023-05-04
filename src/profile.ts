@@ -10,11 +10,13 @@ export interface Profile {
     description?: string
 }
 
+export type SignedProfile = msg.SignedRequest<Profile & {timestamp:number}>
+
 /**
  * @description Create a signed profile, don't write anything.
  */
 export async function createProfile (crypto:Crypto.Implementation, args:Profile)
-:Promise<msg.SignedRequest<Profile & {timestamp:number}>> {
+:Promise<SignedProfile> {
     return msg.create(
         crypto,
         Object.assign({}, args, { timestamp: timestamp() })

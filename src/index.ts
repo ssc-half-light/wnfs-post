@@ -1,14 +1,13 @@
 import * as wn from '@oddjs/odd'
 import type { Crypto } from '@oddjs/odd'
 import { Message, createPost } from './post'
-// import { createProfile, Profile } from './profile'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 import { SignedRequest } from '@ssc-hermes/message'
 import { writeKeyToDid } from '@ssc-hermes/util'
 import { createUsername, rootDIDForWnfs, sign, toString } from './util'
-import { createProfile, Profile } from './profile'
+import { createProfile, Profile, SignedProfile } from './profile'
 
 export interface AcceptedFriendship {
     type:string,
@@ -57,7 +56,7 @@ export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR:string
     BLOB_DIR:string
-    PROFILE_PATH:Path.FilePath<['private', string, ...string[]]>
+    PROFILE_PATH:Path.FilePath<['public', string, ...string[]]>
     FRIENDS_LIST_PATH:Path.FilePath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
@@ -74,10 +73,11 @@ export class WnfsPost {
         this.program = program
         this.LOG_DIR = LOG_DIR || 'log'
         this.BLOB_DIR = BLOB_DIR || 'blob'
-        this.PROFILE_PATH = wn.path.appData(
-            this.APP_INFO,
-            wn.path.file('profile.json')
-        )
+        this.PROFILE_PATH = wn.path.file('public', 'profile.json')
+        // this.PROFILE_PATH = wn.path.appData(
+        //     this.APP_INFO,
+        //     wn.path.file('profile.json')
+        // )
         this.FRIENDS_LIST_PATH = wn.path.appData(
             this.APP_INFO,
             wn.path.file('friends.json')
@@ -211,7 +211,7 @@ export class WnfsPost {
      * @description Create a signed profile and write it to `wnfs`
      * at the right path, or read a Profile
      */
-    async profile (args?:newProfile):Promise<SignedRequest<Profile & {timestamp:number}>> {
+    async profile (args?:newProfile):Promise<SignedProfile> {
         if (!args) {
             // read and return existing profile
             const profileData = await this.wnfs.read(this.PROFILE_PATH)
@@ -293,7 +293,7 @@ export class WnfsPost {
         )
 
         const shareDetails = await this.wnfs.sharePrivate(
-            [this.FRIENDS_LIST_PATH, blobPath, logPath, this.PROFILE_PATH],
+            [this.FRIENDS_LIST_PATH, blobPath, logPath],
             { shareWith: recipient }
         )
 
@@ -347,7 +347,7 @@ export class WnfsPost {
         )
 
         const myShareDetails = await this.wnfs.sharePrivate(
-            [this.FRIENDS_LIST_PATH, blobPath, logPath, this.PROFILE_PATH],
+            [this.FRIENDS_LIST_PATH, blobPath, logPath],
             { shareWith: shareDetails.sharedBy.username }
         )
 
