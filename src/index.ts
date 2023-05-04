@@ -1,11 +1,13 @@
 import * as wn from '@oddjs/odd'
 import type { Crypto } from '@oddjs/odd'
 import { Message, createPost } from './post'
-import { createProfile, Profile } from './profile'
-import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
+// import { createProfile, Profile } from './profile'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
+import { SignedRequest } from '@ssc-hermes/message'
+import { createUsername, writeKeyToDid, rootDIDForWnfs, sign, toString } from './util'
+import { createProfile, Profile } from './profile'
 
 export interface AcceptedFriendship {
     type:string,
@@ -164,7 +166,8 @@ export class WnfsPost {
             text,
             alt,
             author,
-            username: this.username
+            username: this.username,
+            filename: file.name
         })
 
         const imgFilepath = wn.path.appData(
@@ -193,7 +196,7 @@ export class WnfsPost {
         return newPost
     }
 
-    async writeProfile (profile:Profile):Promise<Profile> {
+    async writeProfile (profile:SignedRequest<Profile>):Promise<SignedRequest<Profile>> {
         await this.wnfs.write(
             this.PROFILE_PATH,
             new TextEncoder().encode(JSON.stringify(profile))
@@ -207,7 +210,7 @@ export class WnfsPost {
      * @description Create a signed profile and write it to `wnfs`
      * at the right path, or read a Profile
      */
-    async profile (args?:newProfile):Promise<Profile> {
+    async profile (args?:newProfile):Promise<SignedRequest<Profile>> {
         if (!args) {
             // read and return existing profile
             const profileData = await this.wnfs.read(this.PROFILE_PATH)
@@ -221,8 +224,8 @@ export class WnfsPost {
             username: this.username,
             rootDID: rootDIDForWnfs(this.wnfs)
         }
-        const { keystore } = this.crypto
-        const updatedProfile = await createProfile(keystore, profileArgs)
+        // const { keystore } = this.crypto
+        const updatedProfile = await createProfile(this.crypto, profileArgs)
 
         await this.wnfs.write(
             this.PROFILE_PATH,

@@ -1,10 +1,12 @@
-import { sign, toString } from './util.js'
-import stringify from 'json-stable-stringify'
-import { Implementation } from '@oddjs/odd/components/crypto/implementation'
+// import { sign, toString } from './util.js'
+// import stringify from 'json-stable-stringify'
 import timestamp from 'monotonic-timestamp'
-type KeyStore = Implementation['keystore']
+import * as msg from '@ssc-hermes/message'
+import { Crypto } from '@oddjs/odd'
+// import { Implementation } from '@oddjs/odd/components/crypto/implementation'
+// type KeyStore = Implementation['keystore']
 
-interface ProfileArgs {
+export interface Profile {
     humanName: string
     author: string
     username: string
@@ -12,23 +14,20 @@ interface ProfileArgs {
     description?: string
 }
 
-export interface ProfileValue extends ProfileArgs {
-    type: string,
-    timestamp: number
-}
+// export interface ProfileValue extends ProfileArgs {
+//     type: string,
+//     timestamp: number
+// }
 
-export interface Profile {
-    value: ProfileValue,
-    signature: string
-}
+// export interface Profile {
+//     value: ProfileValue,
+//     signature: string
+// }
 
 /**
  * @description Create a signed profile, don't write anything.
  */
-export async function createProfile (keystore:KeyStore, args:ProfileArgs)
-:Promise<Profile> {
-    return {
-        value: Object.assign(args, { type: 'about', timestamp: timestamp() }),
-        signature: toString(await sign(keystore, stringify(args)))
-    }
+export async function createProfile (crypto:Crypto.Implementation, args:Profile)
+:Promise<msg.SignedRequest<Profile>> {
+    return msg.create(crypto, Object.assign({}, args, { timestamp: timestamp() }))
 }

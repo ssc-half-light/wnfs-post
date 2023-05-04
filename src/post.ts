@@ -10,6 +10,7 @@ interface newPostArgs {
     username: string  // DNS username
     alt?: string,  // alt text for image
     text: string  // message text
+    filename:string  // so we can get the file extension
 }
 
 export interface Message {
@@ -26,7 +27,8 @@ export interface Message {
  */
 export async function createPost (keystore:KeyStore, args:newPostArgs):
 Promise<Message> {
-    const { sequence, text, alt, author, username } = args
+    const { sequence, text, alt, author, username, filename } = args
+    const ext = filename.split('.').pop()?.toLowerCase()
 
     const unsignedMsg = {
         sequence,
@@ -37,7 +39,7 @@ Promise<Message> {
             type: 'post',
             text: text,
             alt: alt || '',
-            mentions: [sequence + '-0.jpg']  // handle 1 image per post
+            mentions: [sequence + `-0.${ext}`]  // handle 1 image per post
         }
     }
 
