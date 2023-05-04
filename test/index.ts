@@ -5,7 +5,7 @@ import { createProfile } from '../src/profile.js'
 import { writeKeyToDid } from '@ssc-hermes/util'
 
 // @ts-ignore
-const wn = window.webnative
+const wn = self.oddjs
 
 const blob = new Blob(['ok'], {
     type: 'image/jpeg',
