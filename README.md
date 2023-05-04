@@ -3,7 +3,7 @@ Use Fission as storage for post objects with associated blobs.
 
 ## install
 ```
-npm i -S @nichoth/wnfs-post
+npm i -S @ssc-hermes/wnfs-post
 ```
 
 ## test

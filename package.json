@@ -1,8 +1,8 @@
 {
-  "name": "@nichoth/wnfs-post",
+  "name": "@ssc-hermes/wnfs-post",
   "type": "module",
   "version": "0.20.0",
-  "description": "Fission storage for hermes",
+  "description": "Fission storage for hermes application",
   "main": "index.js",
   "scripts": {
     "lint": "standardx -v \"./**/*.ts\"",
