@@ -7,9 +7,7 @@ import { createProfile } from '../src/profile.js'
 // @ts-ignore
 const wn = self.oddjs
 
-const blob = new Blob(['ok'], {
-    type: 'image/jpeg',
-})
+const blob = new Blob(['ok'], { type: 'image/jpeg', })
 const file = new File([blob], 'ok.jpg', { type: 'image/jpeg' })
 let wnfsPost:WnfsPost
 
