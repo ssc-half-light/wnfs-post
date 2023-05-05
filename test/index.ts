@@ -3,6 +3,7 @@ import { writeKeyToDid } from '@ssc-hermes/util'
 import { createUsername, verify } from '../src/util.js'
 import { WnfsPost } from '../src/index.js'
 import { createProfile } from '../src/profile.js'
+// import { lookup } from '@oddjs/odd'
 
 // @ts-ignore
 const wn = self.oddjs

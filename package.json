@@ -8,6 +8,7 @@
     "lint": "standardx -v \"./**/*.ts\"",
     "build-tests": "node ./test/build.js",
     "test": "node ./test/run-tests.js",
+    "test-anon": "esbuild test/pub-lookup.ts --platform=node --format=esm --keep-names | node --input-type=module | tap-arc",
     "build-cjs": "esbuild src/*.ts --format=cjs --keep-names --outdir=./dist --out-extension:.js=.cjs",
     "build": "mkdir -p ./dist && rm -rf ./dist/* && npm run build-cjs && tsc",
     "preversion": "npm run lint",
@@ -50,6 +51,7 @@
     "uint8arrays": "^4.0.3"
   },
   "devDependencies": {
+    "@ssc-hermes/node-components": "^0.0.4",
     "@typescript-eslint/parser": "^5.55.0",
     "esbuild": "^0.15.18",
     "standardx": "^7.0.0",

@@ -73,7 +73,7 @@ export class WnfsPost {
         this.program = program
         this.LOG_DIR = LOG_DIR || 'log'
         this.BLOB_DIR = BLOB_DIR || 'blob'
-        this.PROFILE_PATH = wn.path.file('public', 'profile.json')
+        this.PROFILE_PATH = wn.path.file('public', 'hermes', 'profile.json')
         // this.PROFILE_PATH = wn.path.appData(
         //     this.APP_INFO,
         //     wn.path.file('profile.json')

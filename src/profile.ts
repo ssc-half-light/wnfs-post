@@ -10,7 +10,7 @@ export interface Profile {
     description?: string
 }
 
-export type SignedProfile = msg.SignedRequest<Profile & {timestamp:number}>
+export type SignedProfile = msg.SignedRequest<Profile & { timestamp:number }>
 
 /**
  * @description Create a signed profile, don't write anything.
