@@ -1,8 +1,7 @@
 import { test } from 'tapzero'
 import { writeKeyToDid } from '@ssc-hermes/util'
-import { createUsername, verify } from '../src/util.js'
+import { verify } from '../src/util.js'
 import { WnfsPost } from '../src/index.js'
-import { createProfile } from '../src/profile.js'
 
 // @ts-ignore
 const wn = self.oddjs
@@ -27,46 +26,4 @@ test('make a post', async t => {
     t.equal(post.content.text, 'testing', 'should set content.text')
     t.equal(post.username, wnfsPost.username, 'should have the username in the post')
     t.equal(await verify(post.author, post), true, 'should verify the post')
-})
-
-test('create and write a profile', async t => {
-    const profile = await wnfsPost.profile({
-        humanName: 'aaa',
-        description: 'look at my description'
-    })
-
-    t.equal(typeof profile.username, 'string', 'should have a username')
-    t.ok(profile.timestamp, 'should have a timestamp')
-    t.equal(profile.humanName, 'aaa', 'should have a human name')
-    t.equal(profile.description, 'look at my description',
-        'should have description')
-    t.equal(typeof profile.signature, 'string', 'should have a signature')
-    t.equal(profile.author, await writeKeyToDid(wnfsPost.program.components.crypto),
-        'should set author to the DID that wrote the message')
-})
-
-test('read your own profile', async t => {
-    const profile = await wnfsPost.profile()
-    t.ok(profile, 'should get profile')
-    t.equal(profile.description, 'look at my description',
-        'should have the right description')
-    t.ok(profile.author, 'should have author in profile')
-})
-
-test('create a profile, then write it to disk', async t => {
-    const { crypto } = wnfsPost.program.components
-    const profile = await createProfile(crypto, {
-        humanName: 'bbb',
-        author: await writeKeyToDid(wnfsPost.program.components.crypto),
-        username: await createUsername(wnfsPost.program.components.crypto),
-        rootDID: await writeKeyToDid(wnfsPost.program.components.crypto),
-        description: 'wooo describing things'
-    })
-    t.ok(profile.signature, 'should sign the profile message')
-    await wnfsPost.writeProfile(profile)
-})
-
-test('read the profile we just made', async t => {
-    const profile = await wnfsPost.profile()
-    t.equal(profile.humanName, 'bbb', 'should return the new profile')
 })

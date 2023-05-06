@@ -4,10 +4,8 @@ import { Message, createPost } from './post'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
-import { SignedRequest } from '@ssc-hermes/message'
 import { writeKeyToDid } from '@ssc-hermes/util'
-import { createUsername, rootDIDForWnfs, sign, toString } from './util'
-import { createProfile, Profile, SignedProfile } from './profile'
+import { createUsername, sign, toString } from './util'
 
 export interface AcceptedFriendship {
     type:string,
@@ -32,11 +30,6 @@ export interface FriendRequest {
     signature: string
 }
 
-interface newProfile {
-    description?: string,
-    humanName: string,
-}
-
 interface newPostArgs {
     text:string,
     alt?: string
@@ -56,7 +49,6 @@ export class WnfsPost {
     APP_INFO:{ name:string, creator:string }
     LOG_DIR:string
     BLOB_DIR:string
-    PROFILE_PATH:Path.FilePath<['public', string, ...string[]]>
     FRIENDS_LIST_PATH:Path.FilePath<['private', string, ...string[]]>
     wnfs:wn.FileSystem
     crypto: Crypto.Implementation
@@ -73,11 +65,6 @@ export class WnfsPost {
         this.program = program
         this.LOG_DIR = LOG_DIR || 'log'
         this.BLOB_DIR = BLOB_DIR || 'blob'
-        this.PROFILE_PATH = wn.path.file('public', 'profile.json')
-        // this.PROFILE_PATH = wn.path.appData(
-        //     this.APP_INFO,
-        //     wn.path.file('profile.json')
-        // )
         this.FRIENDS_LIST_PATH = wn.path.appData(
             this.APP_INFO,
             wn.path.file('friends.json')
@@ -195,47 +182,6 @@ export class WnfsPost {
         reader.readAsArrayBuffer(file)
 
         return newPost
-    }
-
-    async writeProfile (profile:SignedRequest<Profile>):Promise<SignedRequest<Profile>> {
-        await this.wnfs.write(
-            this.PROFILE_PATH,
-            new TextEncoder().encode(JSON.stringify(profile))
-        )
-        await this.wnfs.publish()
-
-        return profile
-    }
-
-    /**
-     * @description Create a signed profile and write it to `wnfs`
-     * at the right path, or read a Profile
-     */
-    async profile (args?:newProfile):Promise<SignedProfile> {
-        if (!args) {
-            // read and return existing profile
-            const profileData = await this.wnfs.read(this.PROFILE_PATH)
-            return JSON.parse(new TextDecoder().decode(profileData))
-        }
-
-        const profileArgs = {
-            username: this.username,
-            humanName: args.humanName,
-            description: args.description,
-            author: await writeKeyToDid(this.crypto),
-            rootDID: rootDIDForWnfs(this.wnfs)
-        }
-
-        const updatedProfile = await createProfile(this.crypto, profileArgs)
-
-        await this.wnfs.write(
-            this.PROFILE_PATH,
-            new TextEncoder().encode(JSON.stringify(updatedProfile))
-        )
-
-        await this.wnfs.publish()
-
-        return updatedProfile
     }
 
     /**
