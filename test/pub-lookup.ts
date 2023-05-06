@@ -71,7 +71,9 @@ async function lookup (username) {
     console.log('**public cid**', publicCid)
     const publicTree = await PublicTree.fromCID(depot, reference, publicCid)
     console.log('**public tree**', publicTree)
-    const res = await publicTree.ls(['*'])
+    const res = await publicTree.ls(
+        odd.path.unwrap(odd.path.directory('Unsplash'))
+    )
     //     odd.path.unwrap(odd.path.file('profile.js'))
 
     console.log('**ressssssssss**', res)
