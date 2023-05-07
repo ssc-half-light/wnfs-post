@@ -20,7 +20,7 @@ test('make a post', async t => {
     })
 
     t.ok(wnfsPost, 'should create a wnfsPosts object')
-    t.equal(post.author, await writeKeyToDid(wnfsPost.program.components.crypto),
+    t.equal(post.author, await writeKeyToDid(wnfsPost.crypto),
         'should have the right author in the post')
     t.equal(post.content.type, 'post', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
