@@ -1,11 +1,12 @@
 import * as wn from '@oddjs/odd'
 import type { Crypto } from '@oddjs/odd'
-import { Message, createPost } from './post'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 import { writeKeyToDid } from '@ssc-hermes/util'
-import { createUsername, sign, toString } from './util'
+import { createUsername } from '@ssc-hermes/profile/util'
+import { Message, createPost } from './post'
+import { sign, toString } from './util'
 
 export interface AcceptedFriendship {
     type:string,
