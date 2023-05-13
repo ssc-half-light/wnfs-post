@@ -33,7 +33,7 @@ export interface FriendRequest {
 
 interface newPostArgs {
     text:string,
-    alt?: string
+    alt?:string
 }
 
 interface wnfsPostsArgs {
@@ -166,6 +166,7 @@ export class WnfsPost {
             // ^ we are only supporting single image per post right now
         )
 
+        // write the post and image file
         const reader = new FileReader()
         reader.onloadend = async () => {
             await Promise.all([
