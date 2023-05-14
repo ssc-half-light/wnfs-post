@@ -45,7 +45,7 @@
     "@oddjs/odd": "^0.37.1",
     "@ssc-hermes/message": "^0.4.0",
     "@ssc-hermes/profile": "^0.2.1",
-    "@ssc-hermes/util": "^0.3.1",
+    "@ssc-hermes/util": "^0.4.2",
     "json-stable-stringify": "^1.0.2",
     "monotonic-timestamp": "^0.0.9",
     "uint8arrays": "^4.0.3"
