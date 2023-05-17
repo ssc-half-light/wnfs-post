@@ -44,6 +44,7 @@
   "dependencies": {
     "@oddjs/odd": "^0.37.1",
     "@ssc-hermes/message": "^0.4.0",
+    "@ssc-hermes/post": "^0.2.1",
     "@ssc-hermes/profile": "^0.2.1",
     "@ssc-hermes/util": "^0.4.2",
     "json-stable-stringify": "^1.0.2",

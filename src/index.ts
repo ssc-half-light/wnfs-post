@@ -5,7 +5,7 @@ import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
 import { writeKeyToDid } from '@ssc-hermes/util'
 import { createUsername } from '@ssc-hermes/profile/util'
-import { Message, createPost } from './post'
+import { SignedPost, fromArray } from '@ssc-hermes/post'
 import { sign, toString } from './util'
 
 export interface AcceptedFriendship {
@@ -33,7 +33,7 @@ export interface FriendRequest {
 
 interface newPostArgs {
     text:string,
-    alt?:string
+    alt:string
 }
 
 interface wnfsPostsArgs {
@@ -118,7 +118,7 @@ export class WnfsPost {
      * @param {string} newPostArgs.alt newPostArgs.alt -
      * `alt` text attribute for the image
      */
-    async post (file:File, { text, alt }:newPostArgs):Promise<Message> {
+    async post (file:File, { text, alt }:newPostArgs):Promise<SignedPost> {
         //
         // images for each post are related via naming convention
         //   so post with seq 1 would have an image file like `1-1.jpg`
@@ -146,44 +146,55 @@ export class WnfsPost {
             wn.path.file(this.LOG_DIR, n + '.json')
         )
 
-        const { keystore } = this.crypto
-        const author = await writeKeyToDid(this.crypto)
-
-        // write the JSON
-        const newPost:Message = await createPost(keystore, {
-            sequence: n,
-            text,
-            alt,
-            author,
-            username: this.username,
-            filename: file.name
-        })
+        const { crypto } = this
 
         const imgFilepath = wn.path.appData(
             this.APP_INFO,
             // filename is like `postSeqNumber-imageNumber.jpg`
             wn.path.file(this.BLOB_DIR, n + '-0' + '.' + ext)
-            // ^ we are only supporting single image per post right now
+            // ^ we are only supporting a single image per post right now
         )
 
-        // write the post and image file
-        const reader = new FileReader()
-        reader.onloadend = async () => {
-            await Promise.all([
-                this.wnfs.write(
-                    newPostPath,
-                    new TextEncoder().encode(JSON.stringify(newPost))
-                ),
+        return new Promise((resolve, reject) => {
+            // write the post and image file
+            const reader = new FileReader()
 
-                this.wnfs.write(imgFilepath, reader.result as Uint8Array)
-            ])
+            reader.onerror = () => {
+                return reject(reader.error)
+            }
 
-            await this.wnfs.publish()
-        }
+            // write the image and also the post
+            reader.onloadend = async () => {
+                if (!reader.result) throw new Error('no content')
 
-        reader.readAsArrayBuffer(file)
+                const newPost = await fromArray(
+                    crypto,
+                    new Uint8Array(reader.result as ArrayBuffer),
+                    {
+                        seq: n,
+                        prev: 'hash-here',
+                        text,
+                        alt,
+                        username: this.username
+                    }
+                )
 
-        return newPost
+                await Promise.all([
+                    this.wnfs.write(
+                        newPostPath,
+                        new TextEncoder().encode(JSON.stringify(newPost))
+                    ),
+
+                    this.wnfs.write(imgFilepath, reader.result as Uint8Array)
+                ])
+
+                await this.wnfs.publish()
+
+                return resolve(newPost)
+            }
+
+            reader.readAsArrayBuffer(file)
+        })
     }
 
     /**
