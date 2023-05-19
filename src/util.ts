@@ -1,11 +1,9 @@
-import * as uint8arrays from 'uint8arrays'
+import { toString as arrToString, fromString } from 'uint8arrays'
 import type { Crypto } from '@oddjs/odd'
 import { publicKeyToDid } from '@oddjs/odd/did/transformers'
 import * as BrowserCrypto from '@oddjs/odd/components/crypto/implementation/browser'
 import { Implementation } from '@oddjs/odd/components/crypto/implementation'
 import * as wn from '@oddjs/odd'
-import stringify from 'json-stable-stringify'
-import { Message } from './post'
 type KeyStore = Implementation['keystore']
 
 const KEY_TYPE = {
@@ -19,11 +17,11 @@ const RSA_DID_PREFIX = new Uint8Array([ 0x00, 0xf5, 0x02 ])
 const BASE58_DID_PREFIX = 'did:key:z'
 
 export function sign (keystore:KeyStore, msg:string) {
-    return keystore.sign(uint8arrays.fromString(msg))
+    return keystore.sign(fromString(msg))
 }
 
 export function toString (arr:Uint8Array) {
-    return uint8arrays.toString(arr, 'base64url')
+    return arrToString(arr, 'base64url')
 }
 
 // export async function createUsername (program:wn.Program):Promise<string> {
@@ -34,7 +32,7 @@ export async function createUsername (crypto:Crypto.Implementation):Promise<stri
         new TextEncoder().encode(normalizedDid)
     )
 
-    return uint8arrays.toString(hashedUsername, 'base32').slice(0, 32)
+    return arrToString(hashedUsername, 'base32').slice(0, 32)
 }
 
 async function createDID (crypto: Crypto.Implementation): Promise<string> {
@@ -43,30 +41,13 @@ async function createDID (crypto: Crypto.Implementation): Promise<string> {
     return publicKeyToDid(crypto, pubKey, ksAlg)
 }
 
-export const verify = async (did:string, msg:Message) => {
-    const { publicKey, type } = didToPublicKey(did)
-    const keyType = BrowserCrypto.did.keyTypes[type]
-    const sig = msg.signature as string
-    const msgValue:Partial<Message> = Object.assign({}, msg)
-    delete msgValue.signature
-    const msgString = stringify(msgValue)
-
-    const res = await keyType.verify({
-        message: uint8arrays.fromString(msgString),
-        publicKey,
-        signature: uint8arrays.fromString(sig, 'base64url')
-    })
-
-    return res
-}
-
 export function didToPublicKey (did:string): ({ publicKey:Uint8Array, type:string }) {
     if (!did.startsWith(BASE58_DID_PREFIX)) {
         throw new Error('Please use a base58-encoded DID formatted `did:key:z...`')
     }
 
     const didWithoutPrefix = ('' + did.substr(BASE58_DID_PREFIX.length))
-    const magicalBuf = uint8arrays.fromString(didWithoutPrefix, 'base58btc')
+    const magicalBuf = fromString(didWithoutPrefix, 'base58btc')
     const { keyBuffer, type } = parseMagicBytes(magicalBuf)
 
     return {

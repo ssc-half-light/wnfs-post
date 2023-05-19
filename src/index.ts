@@ -3,9 +3,9 @@ import type { Crypto } from '@oddjs/odd'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
 import * as Path from '@oddjs/odd/path/index'
-import { writeKeyToDid } from '@ssc-hermes/util'
+import { writeKeyToDid, blobFromFile } from '@ssc-hermes/util'
 import { createUsername } from '@ssc-hermes/profile/util'
-import { SignedPost, fromArray } from '@ssc-hermes/post'
+import { SignedPost } from '@ssc-hermes/post'
 import { sign, toString } from './util'
 
 export interface AcceptedFriendship {
@@ -31,10 +31,10 @@ export interface FriendRequest {
     signature: string
 }
 
-interface newPostArgs {
-    text:string,
-    alt:string
-}
+// interface newPostArgs {
+//     text:string,
+//     alt:string
+// }
 
 interface wnfsPostsArgs {
     APP_INFO:{ name:string, creator:string }
@@ -109,28 +109,11 @@ export class WnfsPost {
         return wnfsPost
     }
 
-    /**
-     * @description Write a new post to the `wnfs`. This will find the correct
-     * sequence number and author DID for the post, and sign the post
-     * @param {File} file - the image File, like from an HTML form
-     * @param {newPostArgs} newPostArgs content for the new post
-     * @param {string} newPostArgs.text newPostArgs.text - text content for the post
-     * @param {string} newPostArgs.alt newPostArgs.alt -
-     * `alt` text attribute for the image
-     */
-    async post (file:File, { text, alt }:newPostArgs):Promise<SignedPost> {
-        //
-        // images for each post are related via naming convention
-        //   so post with seq 1 would have an image file like `1-1.jpg`
-        //
-
-        const ext = file.name.split('.').pop()?.toLowerCase()
-
+    async getNextSeq () {
         const logPath = wn.path.appData(
             this.APP_INFO,
             wn.path.directory(this.LOG_DIR)
         )
-
         await this.wnfs.mkdir(logPath)
         const existingPosts = await this.wnfs.ls(logPath)
         const ns = (Object.keys(existingPosts) || [])
@@ -139,62 +122,40 @@ export class WnfsPost {
 
         const n = ns.length ? (ns[0] + 1) : 0
 
+        return n
+    }
+
+    /**
+     * @description Write a new post to `wnfs`. This will find the correct
+     * sequence number
+     * @param {File} file - the image File, like from an HTML form
+     * @param {SignedPost} post The Post object we are writing
+     */
+    async post (file:File, post:SignedPost):Promise<SignedPost> {
+        // const ext = file.name.split('.').pop()?.toLowerCase()
+
+        const n = this.getNextSeq()
+
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
-        const newPostPath = wn.path.appData(
-            this.APP_INFO,
-            wn.path.file(this.LOG_DIR, n + '.json')
-        )
+        const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, n)
+        const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
+            this.BLOB_DIR,
+            post.content.mentions[0]
+        ))
 
-        const { crypto } = this
+        const blob = await blobFromFile(file)
 
-        const imgFilepath = wn.path.appData(
-            this.APP_INFO,
-            // filename is like `postSeqNumber-imageNumber.jpg`
-            wn.path.file(this.BLOB_DIR, n + '-0' + '.' + ext)
-            // ^ we are only supporting a single image per post right now
-        )
+        await Promise.all([
+            this.wnfs.write(
+                newPostPath,
+                new TextEncoder().encode(JSON.stringify(post))
+            ),
 
-        return new Promise((resolve, reject) => {
-            // write the post and image file
-            const reader = new FileReader()
+            this.wnfs.write(imgFilepath, blob)
+        ])
 
-            reader.onerror = () => {
-                return reject(reader.error)
-            }
-
-            // write the image and also the post
-            reader.onloadend = async () => {
-                if (!reader.result) throw new Error('no content')
-
-                const newPost = await fromArray(
-                    crypto,
-                    new Uint8Array(reader.result as ArrayBuffer),
-                    {
-                        seq: n,
-                        prev: 'hash-here',
-                        text,
-                        alt,
-                        username: this.username
-                    }
-                )
-
-                await Promise.all([
-                    this.wnfs.write(
-                        newPostPath,
-                        new TextEncoder().encode(JSON.stringify(newPost))
-                    ),
-
-                    this.wnfs.write(imgFilepath, reader.result as Uint8Array)
-                ])
-
-                await this.wnfs.publish()
-
-                return resolve(newPost)
-            }
-
-            reader.readAsArrayBuffer(file)
-        })
+        return post
     }
 
     /**
@@ -323,17 +284,20 @@ export class WnfsPost {
     }
 }
 
-// newly added friend should get a default shared folder
-// we can add posts to it
-// __public data__
-//   * our profile data -- username, description, avatar
-//
-// __default shared data__
-//   * have a default/friends folder for every user
-//   * show who your other friends are (this will be configurable in the future)
-//   * 'friends' folder contains -- list of friends, photos added by user
-//
-// have a list of friends that is semi-private (shared with your friends)
-// have a 'friends' folder -- this will be the default way to make a post,
-//   it goes in the 'fiends' folder
-//
+// function getImagePath (sequence) {
+//     const imgPath = wn.path.appData(
+//         APP_INFO,
+//         // @TODO -- file extensions
+//         wn.path.file(BLOB_DIR_PATH, sequence + '-0.jpg')
+//     )
+
+//     return imgPath
+// }
+
+function getPostPath (appInfo, logDir, sequence) {
+    const postPath = wn.path.appData(
+        appInfo,
+        wn.path.file(logDir, sequence + '.json')
+    )
+    return postPath
+}
