@@ -284,16 +284,6 @@ export class WnfsPost {
     }
 }
 
-// function getImagePath (sequence) {
-//     const imgPath = wn.path.appData(
-//         APP_INFO,
-//         // @TODO -- file extensions
-//         wn.path.file(BLOB_DIR_PATH, sequence + '-0.jpg')
-//     )
-
-//     return imgPath
-// }
-
 function getPostPath (appInfo, logDir, sequence) {
     const postPath = wn.path.appData(
         appInfo,
