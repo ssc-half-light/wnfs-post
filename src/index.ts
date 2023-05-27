@@ -136,12 +136,14 @@ export class WnfsPost {
 
         const n = this.getNextSeq()
 
+        const ext = (file.name.split('.').pop())
+
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
         const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, n)
         const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
             this.BLOB_DIR,
-            post.content.mentions[0]
+            (post.content.mentions[0] + `.${ext}`)
         ))
 
         const blob = await blobFromFile(file)
