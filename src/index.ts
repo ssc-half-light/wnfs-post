@@ -142,6 +142,7 @@ export class WnfsPost {
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
         const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, key)
+        console.log('** new post path **', newPostPath)
         const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
             this.BLOB_DIR,
             post.content.mentions[0]
