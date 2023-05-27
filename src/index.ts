@@ -157,6 +157,8 @@ export class WnfsPost {
             this.wnfs.write(imgFilepath, blob)
         ])
 
+        await this.wnfs.publish()
+
         return post
     }
 
