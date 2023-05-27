@@ -27,14 +27,14 @@ test('make a post', async t => {
 
     console.log('*post*', post)
     t.ok(wnfsPost, 'should create a wnfsPosts object')
-    t.equal(post.prev, null, 'should have null as previous message')
-    t.equal(post.seq, 0, 'should have the right sequence number')
-    t.equal(post.author, await writeKeyToDid(wnfsPost.crypto),
+    t.equal(post.metadata.prev, null, 'should have null as previous message')
+    t.equal(post.metadata.seq, 0, 'should have the right sequence number')
+    t.equal(post.metadata.author, await writeKeyToDid(wnfsPost.crypto),
         'should have the right author in the post')
-    t.equal(post.content.type, 'private', 'should set content.type')
+    t.equal(post.metadata.type, 'private', 'should set content.type')
     t.equal(post.content.text, 'testing', 'should set content.text')
-    t.equal(post.username, wnfsPost.username, 'should have the username in the post')
-    t.equal(await verify(post), true, 'should verify the post')
+    t.equal(post.metadata.username, wnfsPost.username, 'should have the username in the post')
+    t.equal(await verify(post.metadata), true, 'should verify the post')
 })
 
 function dataURItoFile (dataurl, filename) {
