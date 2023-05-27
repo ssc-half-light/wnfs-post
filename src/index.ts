@@ -1,4 +1,5 @@
 import * as wn from '@oddjs/odd'
+import { toString as bufToString } from 'uint8arrays/to-string'
 import type { Crypto } from '@oddjs/odd'
 import { ShareDetails } from '@oddjs/odd/fs/types'
 import stringify from 'json-stable-stringify'
@@ -6,6 +7,8 @@ import * as Path from '@oddjs/odd/path/index'
 import { writeKeyToDid, blobFromFile } from '@ssc-hermes/util'
 import { createUsername } from '@ssc-hermes/profile/util'
 import { SignedPost } from '@ssc-hermes/post'
+import { blake3 } from '@noble/hashes/blake3'
+import canon from 'json-canon'
 import { sign, toString } from './util'
 
 export interface AcceptedFriendship {
@@ -131,8 +134,10 @@ export class WnfsPost {
      * @param {File} file - the image File, like from an HTML form
      * @param {SignedPost} post The Post object we are writing
      */
-    async post (file:File, post:SignedPost, { key }:{key:string}):Promise<SignedPost> {
+    async post (file:File, post:SignedPost, { key }:{key?:string}):Promise<SignedPost> {
         // const n = await this.getNextSeq()
+
+        key = key || getId(post.metadata)
 
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
@@ -290,4 +295,10 @@ function getPostPath (appInfo, logDir, sequence) {
         wn.path.file(logDir, sequence + '.json')
     )
     return postPath
+}
+
+function getId (msg:object):string {
+    const hash = blake3(canon(msg))
+    const slugifiedHash = bufToString(hash, 'base64url')
+    return slugifiedHash
 }

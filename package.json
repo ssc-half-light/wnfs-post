@@ -47,6 +47,7 @@
     "@ssc-hermes/post": "^0.6.1",
     "@ssc-hermes/profile": "^0.2.1",
     "@ssc-hermes/util": "^0.6.0",
+    "json-canon": "^1.0.1",
     "json-stable-stringify": "^1.0.2",
     "monotonic-timestamp": "^0.0.9",
     "uint8arrays": "^4.0.3"
