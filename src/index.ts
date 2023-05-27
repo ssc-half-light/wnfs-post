@@ -134,10 +134,10 @@ export class WnfsPost {
      * @param {File} file - the image File, like from an HTML form
      * @param {SignedPost} post The Post object we are writing
      */
-    async post (file:File, post:SignedPost, { key }:{key?:string}):Promise<SignedPost> {
+    async post (file:File, post:SignedPost, opts:{key?:string} = {}):Promise<SignedPost> {
         // const n = await this.getNextSeq()
 
-        key = key || getId(post.metadata)
+        const key = opts.key || getId(post.metadata)
 
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
