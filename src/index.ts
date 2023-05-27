@@ -134,16 +134,14 @@ export class WnfsPost {
     async post (file:File, post:SignedPost):Promise<SignedPost> {
         // const ext = file.name.split('.').pop()?.toLowerCase()
 
-        const n = this.getNextSeq()
-
-        const ext = (file.name.split('.').pop())
+        const n = await this.getNextSeq()
 
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
         const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, n)
         const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
             this.BLOB_DIR,
-            (post.content.mentions[0] + `.${ext}`)
+            post.content.mentions[0]
         ))
 
         const blob = await blobFromFile(file)
