@@ -11,7 +11,7 @@ test('make a post', async t => {
     const APP_INFO = { name: 'testing', creator: 'test' }
 
     wnfsPost = await WnfsPost.create(wn, APP_INFO)
-    const n = await wnfsPost.getNextSeq()
+    // const n = await wnfsPost.getNextSeq()
 
     const base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
     const file = dataURItoFile(base64, 'test.png')
@@ -19,11 +19,11 @@ test('make a post', async t => {
         text: 'testing',
         username: wnfsPost.username,
         alt: 'testing',
-        seq: n,
+        seq: 0,
         prev: null,
         type: 'private'
     })
-    const post = await wnfsPost.post(file, _post)
+    const post = await wnfsPost.post(file, _post, { key: '123' })
 
     console.log('*post*', post)
     t.ok(wnfsPost, 'should create a wnfsPosts object')

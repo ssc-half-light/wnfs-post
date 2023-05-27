@@ -109,21 +109,21 @@ export class WnfsPost {
         return wnfsPost
     }
 
-    async getNextSeq () {
-        const logPath = wn.path.appData(
-            this.APP_INFO,
-            wn.path.directory(this.LOG_DIR)
-        )
-        await this.wnfs.mkdir(logPath)
-        const existingPosts = await this.wnfs.ls(logPath)
-        const ns = (Object.keys(existingPosts) || [])
-            .map(key => parseInt(key.split('.')[0]))
-            .sort((a, b) => b - a) // sort descending order
+    // async getNextSeq () {
+    //     const logPath = wn.path.appData(
+    //         this.APP_INFO,
+    //         wn.path.directory(this.LOG_DIR)
+    //     )
+    //     await this.wnfs.mkdir(logPath)
+    //     const existingPosts = await this.wnfs.ls(logPath)
+    //     const ns = (Object.keys(existingPosts) || [])
+    //         .map(key => parseInt(key.split('.')[0]))
+    //         .sort((a, b) => b - a) // sort descending order
 
-        const n = ns.length ? (ns[0] + 1) : 0
+    //     const n = ns.length ? (ns[0] + 1) : 0
 
-        return n
-    }
+    //     return n
+    // }
 
     /**
      * @description Write a new post to `wnfs`. This will find the correct
@@ -131,14 +131,12 @@ export class WnfsPost {
      * @param {File} file - the image File, like from an HTML form
      * @param {SignedPost} post The Post object we are writing
      */
-    async post (file:File, post:SignedPost):Promise<SignedPost> {
-        // const ext = file.name.split('.').pop()?.toLowerCase()
-
-        const n = await this.getNextSeq()
+    async post (file:File, post:SignedPost, { key }:{key:string}):Promise<SignedPost> {
+        // const n = await this.getNextSeq()
 
         // get filepath for the new post JSON
         // posts are like /log-dir/1.json
-        const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, n)
+        const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, key)
         const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
             this.BLOB_DIR,
             post.content.mentions[0]
