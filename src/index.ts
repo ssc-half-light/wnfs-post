@@ -140,7 +140,7 @@ export class WnfsPost {
         const key = opts.key || getId(post.metadata)
 
         // get filepath for the new post JSON
-        const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, key + '.json')
+        const newPostPath = getPostPath(this.APP_INFO, this.LOG_DIR, key)
         console.log('** new post path **', newPostPath)
         const imgFilepath = wn.path.appData(this.APP_INFO, wn.path.file(
             this.BLOB_DIR,
@@ -289,10 +289,10 @@ export class WnfsPost {
     }
 }
 
-function getPostPath (appInfo, logDir, sequence) {
+function getPostPath (appInfo, logDir, key) {
     const postPath = wn.path.appData(
         appInfo,
-        wn.path.file(logDir, sequence + '.json')
+        wn.path.file(logDir, key + '.json')
     )
     return postPath
 }
